@@ -1,13 +1,15 @@
-import 'package:flutter/material.dart';
+import 'dart:typed_data';
+
 import 'package:csv/csv.dart';
 import 'package:file_selector/file_selector.dart';
-import 'package:moneyjar/screens/components/refresh.dart';
-import 'package:moneyjar/screens/dashboard/dashboard.dart';
-import 'package:moneyjar/screens/transactions/transactions.dart';
-import 'package:moneyjar/screens/accounts/accounts.dart';
-import 'package:moneyjar/screens/categories/categories.dart';
-import 'package:moneyjar/screens/stats/stats_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:moneyjar/controllers/refresh.dart';
 import 'package:moneyjar/data/database.dart';
+import 'package:moneyjar/screens/accounts/accounts_view.dart';
+import 'package:moneyjar/screens/categories/categories_view.dart';
+import 'package:moneyjar/screens/dashboard/dashboard.dart';
+import 'package:moneyjar/screens/stats/stats_view.dart';
+import 'package:moneyjar/screens/transactions/transactions_view.dart';
 
 class SideMenu extends StatelessWidget {
   const SideMenu({
@@ -21,59 +23,103 @@ class SideMenu extends StatelessWidget {
         controller: ScrollController(),
         children: [
           DrawerHeader(
-            child: Image.asset("assets/images/logo.png"),
+            child: Image.asset('assets/images/logo.png'),
           ),
           DrawerListTile(
-            title: "Dashboard",
-            icon: Icon(Icons.home),
+            title: 'Dashboard',
+            icon: const Icon(Icons.home),
             press: () {
               RefreshContext.of(context)!
-                  .refresh(DashboardScreen(), 'Dashboard');
+                  .refreshWidget(const DashboardScreen(), 'Dashboard');
             },
           ),
           DrawerListTile(
-            title: "Transaction",
-            icon: Icon(Icons.receipt),
+            title: 'Transaction',
+            icon: const Icon(Icons.receipt),
             press: () {
               RefreshContext.of(context)!
-                  .refresh(Transactions(), 'Transactions');
+                  .refreshWidget(const TransactionsView(), 'Transactions');
             },
           ),
           DrawerListTile(
-            title: "Accounts",
-            icon: Icon(Icons.account_balance),
+            title: 'Accounts',
+            icon: const Icon(Icons.account_balance),
             press: () {
-              RefreshContext.of(context)!.refresh(Accounts(), 'Accounts');
+              RefreshContext.of(context)!
+                  .refreshWidget(const AccountsView(), 'Accounts');
             },
           ),
           DrawerListTile(
-            title: "Categories",
-            icon: Icon(Icons.category),
+            title: 'Categories',
+            icon: const Icon(Icons.category),
             press: () {
-              RefreshContext.of(context)!.refresh(Categories(), 'Categories');
+              RefreshContext.of(context)!
+                  .refreshWidget(const CategoriesView(), 'Categories');
             },
           ),
           DrawerListTile(
-            title: "Stats",
-            icon: Icon(Icons.bar_chart),
+            title: 'Stats',
+            icon: const Icon(Icons.bar_chart),
             press: () {
-              RefreshContext.of(context)!.refresh(StatsScreen(), 'Stats');
+              RefreshContext.of(context)!
+                  .refreshWidget(const StatsScreen(), 'Stats');
             },
           ),
           DrawerListTile(
-            title: "Import",
-            icon: Icon(Icons.import_export),
+            title: 'Import',
+            icon: const Icon(Icons.import_export),
             press: () async {
-              final xType = XTypeGroup(label: 'CSV', extensions: ['CSV']);
-              final XFile? file = await openFile(acceptedTypeGroups: [xType]);
+              const xType = XTypeGroup(label: 'CSV', extensions: ['CSV']);
+              final file = await openFile(acceptedTypeGroups: [xType]);
               if (file != null) {
-                var myData = await file.readAsString();
-                List<List<dynamic>> csvTable =
-                    CsvToListConverter().convert(myData);
-                DBProvider.db.importCSV(csvTable);
+                final myData = await file.readAsString();
+                final csvTable = const CsvToListConverter().convert(myData);
+                final success = await DBProvider.db.importCSV(csvTable);
+                // show snackbar
+                if (!context.mounted) {
+                  return;
+                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(success > 0
+                        ? 'Imported $success from ${csvTable.length - 1} successfully'
+                        : 'Import failed, please check the file format'),
+                  ),
+                );
               }
             },
           ),
+          DrawerListTile(
+              title: 'Export',
+              icon: const Icon(Icons.file_upload),
+              press: () async {
+                final list = await DBProvider.db.exportCSV();
+                list.insert(0, [
+                  'Category',
+                  'Description',
+                  'Target',
+                  'Amount',
+                  'Type',
+                  'Remark',
+                  'DateTime',
+                  'Account',
+                  'Tag'
+                ]);
+                final csv = const ListToCsvConverter().convert(list);
+                final fileName =
+                    'export—${DateTime.now().millisecondsSinceEpoch}.csv';
+                final result = await getSaveLocation(suggestedName: fileName);
+                if (result == null) {
+                  // Operation was canceled by the user.
+                  return;
+                }
+
+                final fileData = Uint8List.fromList(csv.codeUnits);
+                const mimeType = 'csv/text';
+                final textFile = XFile.fromData(fileData,
+                    mimeType: mimeType, name: fileName);
+                await textFile.saveTo(result.path);
+              })
         ],
       ),
     );
@@ -99,12 +145,12 @@ class DrawerListTile extends StatelessWidget {
       onTap: press,
       horizontalTitleGap: 0.0,
       leading: Container(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         child: icon,
       ),
       title: Text(
         title,
-        style: TextStyle(color: Colors.white54),
+        style: const TextStyle(color: Colors.white54),
       ),
     );
   }

@@ -1,51 +1,45 @@
+import 'package:animations/animations.dart';
+import 'package:data_table_2/data_table_2.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:moneyjar/controllers/update_controller.dart';
 import 'package:moneyjar/data/database.dart';
-import 'package:data_table_2/data_table_2.dart';
-import 'package:flutter/material.dart';
-import 'package:animations/animations.dart';
+import 'package:moneyjar/models/transaction.dart';
 import 'package:moneyjar/screens/transactions/transaction_form.dart';
-import 'package:moneyjar/screens/transactions/transaction_screen.dart';
+import 'package:moneyjar/screens/transactions/transaction_view.dart';
 import 'package:provider/provider.dart';
+
 import '../../constants.dart';
 
 class QueryParams {
-  QueryParams({this.accountId, this.categoryId, this.search, this.from = 0});
+  QueryParams(
+      {this.accountId,
+      this.categoryId,
+      this.search,
+      this.from = 0,
+      this.count = 10});
   List<int>? accountId, categoryId;
   String? search;
   int from;
+  int count;
 }
 
 class TransactionSource extends AsyncDataTableSource {
-  QueryParams params;
-  BuildContext? context;
-  final showRemain;
-
   TransactionSource(
       {required this.params, this.context, this.showRemain = false});
+  QueryParams params;
+  BuildContext? context;
+  final bool showRemain;
 
   @override
-  Future<AsyncRowsResponse> getRows(int start, int end) async {
-    params.from = start;
-    var queryResult = await DBProvider.db.getTransactions(params);
-    var totalRecords = queryResult.totalCount;
-    var result = AsyncRowsResponse(
+  Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
+    params.from = startIndex;
+    params.count = count;
+    final queryResult = await DBProvider.db.getTransactions(params);
+    final totalRecords = queryResult.totalCount;
+    final result = AsyncRowsResponse(
         totalRecords,
         queryResult.transactions.map<DataRow>((transaction) {
-          var tType;
-          switch (transaction.type) {
-            case 1:
-              tType = "Expense";
-              break;
-            case 2:
-              tType = "Income";
-              break;
-            case 3:
-              tType = "Transfer";
-              break;
-            default:
-              tType = "Unknown";
-          }
           return DataRow(
             key: ValueKey<int>(transaction.id!),
             cells: [
@@ -64,7 +58,7 @@ class TransactionSource extends AsyncDataTableSource {
                 closedBuilder: (context, action) =>
                     Text(transaction.category.toString()),
                 openBuilder: (context, action) {
-                  return TransactionScreen(transaction: transaction);
+                  return TransactionView(transaction: transaction);
                 },
               )),
               // DataCell(Text(transaction.category!) ,onTap: ()=>Navigator.push(context!, MaterialPageRoute(builder: (context){
@@ -74,30 +68,33 @@ class TransactionSource extends AsyncDataTableSource {
               DataCell(
                   Text(DateFormat('yyyy-MM-dd').format(transaction.date!))),
               DataCell(Text(transaction.description.toString())),
-              DataCell(Text(transaction.amount.toString())),
-              DataCell(Text(tType)),
+              DataCell(Text((transaction.amount! / 100.0).toString())),
+              DataCell(Text(Transaction.typeString(transaction.type!))),
               DataCell(Text(transaction.account.toString())),
-              if (showRemain) DataCell(Text(transaction.remain.toString())),
+              if (showRemain)
+                DataCell(Text((transaction.remain! / 100.0).toString())),
               DataCell(
                 Row(
                   children: [
-                    IconButton(
-                      icon: Icon(Icons.remove_red_eye),
+                    Expanded(
+                        child: IconButton(
+                      icon: const Icon(Icons.remove_red_eye),
                       onPressed: () {
                         // RefreshContext.of(context!)!.refresh(
                         //     TransactionScreen(transaction: transaction),
                         //     transaction.description);
                         showDialog<void>(
                             context: context!,
-                            builder: (context) => TransactionScreen(
+                            builder: (context) => TransactionView(
                                   transaction: transaction,
                                 ));
                         // RefreshContext.of(context!)!.refresh(
-                        //     TransactionScreen(transaction: transaction));
+                        // TransactionScreen(transaction: transaction));
                       },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.edit),
+                    )),
+                    Expanded(
+                        child: IconButton(
+                      icon: const Icon(Icons.edit),
                       onPressed: () {
                         showDialog<void>(
                             context: context!,
@@ -108,14 +105,15 @@ class TransactionSource extends AsyncDataTableSource {
                                   transaction: transaction,
                                 ));
                       },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.delete),
+                    )),
+                    Expanded(
+                        child: IconButton(
+                      icon: const Icon(Icons.delete),
                       onPressed: () {
                         DBProvider.db.deleteTransaction(transaction.id!);
                         refreshDatasource();
                       },
-                    ),
+                    )),
                   ],
                 ),
               ),
@@ -127,36 +125,31 @@ class TransactionSource extends AsyncDataTableSource {
 }
 
 class TransactionTable extends StatefulWidget {
-  TransactionTable({
+  const TransactionTable({
     this.showRemain = false,
     required this.params,
     Key? key,
   }) : super(key: key);
 
-  final showRemain;
+  final bool showRemain;
   final QueryParams params;
 
   @override
-  _TransactionTableState createState() => _TransactionTableState(
-        params: this.params,
-        showRemain: this.showRemain,
-      );
+  State<TransactionTable> createState() => _TransactionTableState();
 }
 
 class _TransactionTableState extends State<TransactionTable> {
-  QueryParams params;
-  final showRemain;
-  _TransactionTableState({
-    required this.params,
-    this.showRemain = false,
-  });
+  late QueryParams params;
+  late bool showRemain;
 
-  void sort(
-    String column,
-    bool ascending,
-  ) {}
+  @override
+  void initState() {
+    super.initState();
+    params = widget.params;
+    showRemain = widget.showRemain;
+  }
 
-  PaginatorController _controller = PaginatorController();
+  final PaginatorController _controller = PaginatorController();
 
   @override
   Widget build(BuildContext context) {
@@ -167,24 +160,20 @@ class _TransactionTableState extends State<TransactionTable> {
     );
   }
 
-  _buildTable(context, key) {
+  Container _buildTable(context, key) {
     return Container(
       key: key,
-      padding: EdgeInsets.all(defaultPadding),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(defaultPadding),
+      decoration: const BoxDecoration(
         color: secondaryColor,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Transactions",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          SizedBox(
-            width: double.infinity,
-            height: 500,
+          Expanded(
+            // width: double.infinity,
+            // height: 1000,
             child: AsyncPaginatedDataTable2(
               columnSpacing: defaultPadding,
               horizontalMargin: 20,
@@ -192,50 +181,43 @@ class _TransactionTableState extends State<TransactionTable> {
               empty: Center(
                   child: Container(
                       height: 100,
-                      padding: EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(20),
                       // color: Colors.grey[200],
-                      child: Text('No data'))),
+                      child: const Text('No data'))),
               autoRowsToHeight: true,
               checkboxHorizontalMargin: 12,
               controller: _controller,
               wrapInCard: false,
               minWidth: 600,
               columns: [
-                DataColumn(
+                const DataColumn(
                   label: Text('Category'),
                 ),
-                DataColumn(
-                  label: Text('Date'),
-                  onSort: (columnIndex, ascending) => sort("date", ascending),
-                ),
-                DataColumn(
+                const DataColumn(label: Text('Date')),
+                const DataColumn(
                   label: Text('Description'),
                 ),
-                DataColumn(
+                const DataColumn(
                   label: Text('Amount'),
-                  // numeric: true,
-                  onSort: (columnIndex, ascending) => sort("amount", ascending),
                 ),
-                DataColumn(
+                const DataColumn(
                   label: Text('Type'),
                   // numeric: true,
                 ),
-                DataColumn(
+                const DataColumn(
                   label: Text('Account'),
                 ),
                 if (showRemain)
-                  DataColumn(
+                  const DataColumn(
                     label: Text('Remain'),
                     // numeric: true,
                   ),
-                DataColumn(
+                const DataColumn(
                   label: Text('Action'),
                 ),
               ],
               source: TransactionSource(
-                  params: this.params,
-                  context: context,
-                  showRemain: showRemain),
+                  params: params, context: context, showRemain: showRemain),
             ),
           ),
         ],

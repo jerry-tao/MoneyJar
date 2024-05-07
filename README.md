@@ -4,6 +4,11 @@ It works(almost).
 
 ![snap](snap.png)
 
+## Todos
+
+- (feat) Currency Edit
+- (improve) Category Grid UI
+
 ## Thanks
 
 ### 1. Github Copilot
@@ -19,7 +24,3 @@ Thanks [abuanwar072](https://github.com/abuanwar072) for his work [Flutter-Respo
 I use it generate the logo.
 
 
-## Known Issues
-
-- Some pages layout still overflow.
-- Float precision when calculating.

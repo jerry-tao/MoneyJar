@@ -1,9 +1,9 @@
-import 'package:moneyjar/responsive.dart';
-import 'package:moneyjar/screens/components/refresh.dart';
-import 'package:moneyjar/screens/stats/pie.dart';
-import 'package:moneyjar/screens/stats/line.dart';
-import 'package:moneyjar/screens/stats/bar.dart';
 import 'package:flutter/material.dart';
+import 'package:moneyjar/controllers/refresh.dart';
+import 'package:moneyjar/responsive.dart';
+import 'package:moneyjar/screens/stats/bar_view.dart';
+import 'package:moneyjar/screens/stats/line_view.dart';
+import 'package:moneyjar/screens/stats/pie_view.dart';
 
 import '../../../constants.dart';
 
@@ -14,27 +14,27 @@ class StatsField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Size _size = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "Stats Graph",
+              'Stats Graph',
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ],
         ),
-        SizedBox(height: defaultPadding),
+        const SizedBox(height: defaultPadding),
         Responsive(
           mobile: StatsCardGridView(
-            crossAxisCount: _size.width < 650 ? 2 : 4,
-            childAspectRatio: _size.width < 650 && _size.width > 350 ? 1.3 : 1,
+            crossAxisCount: size.width < 650 ? 2 : 4,
+            childAspectRatio: size.width < 650 && size.width > 350 ? 1.3 : 1,
           ),
-          tablet: StatsCardGridView(),
+          tablet: const StatsCardGridView(),
           desktop: StatsCardGridView(
-            childAspectRatio: _size.width < 1400 ? 1.1 : 1.4,
+            childAspectRatio: size.width < 1400 ? 1.1 : 1.4,
           ),
         ),
       ],
@@ -54,7 +54,7 @@ class StatsCardGridView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: stats.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -79,10 +79,10 @@ class StatsInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(defaultPadding),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(defaultPadding),
+      decoration: const BoxDecoration(
         color: secondaryColor,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +92,7 @@ class StatsInfoCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                  padding: EdgeInsets.all(defaultPadding * 0.75),
+                  padding: const EdgeInsets.all(defaultPadding * 0.75),
                   height: 100,
                   width: 100,
                   decoration: BoxDecoration(
@@ -118,30 +118,30 @@ class StatsInfoCard extends StatelessWidget {
 }
 
 class StatGraph {
+
+  StatGraph({this.svgSrc, this.title, this.color, required this.child});
   final String? svgSrc, title;
   final Color? color;
   final Widget child;
-
-  StatGraph({this.svgSrc, this.title, this.color, required this.child});
 }
 
 List stats = [
   StatGraph(
-    title: "Pie",
-    svgSrc: "assets/icons/Documents.svg",
+    title: 'Pie',
+    svgSrc: 'assets/icons/Documents.svg',
     color: primaryColor,
-    child: Pie(),
+    child: const Pie(),
   ),
   StatGraph(
-    title: "Line",
-    svgSrc: "assets/icons/google_drive.svg",
-    color: Color(0xFFFFA113),
-    child: Line(),
+    title: 'Line',
+    svgSrc: 'assets/icons/google_drive.svg',
+    color: const Color(0xFFFFA113),
+    child: const Line(),
   ),
   StatGraph(
-    title: "Bar",
-    svgSrc: "assets/icons/one_drive.svg",
-    color: Color(0xFFA4CDFF),
-    child: Bar(),
+    title: 'Bar',
+    svgSrc: 'assets/icons/one_drive.svg',
+    color: const Color(0xFFA4CDFF),
+    child: const Bar(),
   ),
 ];

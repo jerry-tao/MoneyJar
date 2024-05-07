@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import '../../constants.dart';
 
 class InfoCardGridView extends StatelessWidget {
-  final List<MapEntry> data;
   const InfoCardGridView({
     Key? key,
     required this.data,
     this.crossAxisCount = 4,
     this.childAspectRatio = 1,
   }) : super(key: key);
+  final List<MapEntry> data;
 
   final int crossAxisCount;
   final double childAspectRatio;
@@ -17,7 +17,7 @@ class InfoCardGridView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: data.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -37,15 +37,15 @@ class InfoCard extends StatelessWidget {
     required this.info,
   }) : super(key: key);
 
-  final info;
+  final MapEntry info;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(defaultPadding),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(defaultPadding),
+      decoration: const BoxDecoration(
         color: secondaryColor,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -53,9 +53,9 @@ class InfoCard extends StatelessWidget {
         children: [
           Center(
             child: Text(
-              "${info.value}",
+              '${info.value}',
               maxLines: 1,
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 30, // 设置文本字体大小
                   fontWeight: FontWeight.bold), // 设置),
               overflow: TextOverflow.ellipsis,
@@ -63,7 +63,7 @@ class InfoCard extends StatelessWidget {
           ),
           Center(
             child: Text(
-              "${info.key}",
+              '${info.key}',
               style: Theme.of(context)
                   .textTheme
                   .bodySmall!
@@ -95,7 +95,7 @@ class ProgressLine extends StatelessWidget {
           height: 5,
           decoration: BoxDecoration(
             color: color!.withOpacity(0.1),
-            borderRadius: BorderRadius.all(Radius.circular(10)),
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
           ),
         ),
         LayoutBuilder(
@@ -104,7 +104,7 @@ class ProgressLine extends StatelessWidget {
             height: 5,
             decoration: BoxDecoration(
               color: color,
-              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderRadius: const BorderRadius.all(Radius.circular(10)),
             ),
           ),
         ),

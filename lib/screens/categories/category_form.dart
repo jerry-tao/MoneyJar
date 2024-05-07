@@ -3,32 +3,34 @@ import 'package:moneyjar/models/category.dart';
 import '../../constants.dart';
 
 class CategoryForm extends StatefulWidget {
-  CategoryForm({
+  const CategoryForm({
     Key? key,
     required this.category,
     required this.callback,
   }) : super(key: key);
   final Category category;
-  final callback;
+  final Function(Category) callback;
 
   @override
-  _CategoryFormState createState() =>
-      _CategoryFormState(category: this.category, callback: this.callback);
+  State<CategoryForm> createState() => _CategoryFormState();
 }
 
 class _CategoryFormState extends State<CategoryForm> {
-  _CategoryFormState({
-    required this.category,
-    required this.callback,
-  });
-
   var nameController = TextEditingController();
   var descriptionController = TextEditingController();
   var colorController = TextEditingController();
   var iconController = TextEditingController();
 
-  Category category;
-  final callback;
+  late Category category;
+  late Function(Category) callback;
+
+  @override
+  void initState() {
+    super.initState();
+    category = widget.category;
+    callback = widget.callback;
+  }
+
   @override
   Widget build(BuildContext context) {
     nameController.text = category.name ?? '';
@@ -59,10 +61,10 @@ class _CategoryFormState extends State<CategoryForm> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                SizedBox(height: defaultPadding),
+                const SizedBox(height: defaultPadding),
                 Container(
-                  margin: EdgeInsets.only(top: defaultPadding),
-                  padding: EdgeInsets.all(defaultPadding),
+                  margin: const EdgeInsets.only(top: defaultPadding),
+                  padding: const EdgeInsets.all(defaultPadding),
                   decoration: BoxDecoration(
                     border: Border.all(
                         width: 2, color: primaryColor.withOpacity(0.15)),
@@ -72,7 +74,7 @@ class _CategoryFormState extends State<CategoryForm> {
                   ),
                   child: Row(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                         width: 20,
                       ),
@@ -85,8 +87,8 @@ class _CategoryFormState extends State<CategoryForm> {
                             children: [
                               TextFormField(
                                 controller: nameController,
-                                decoration: InputDecoration(
-                                  labelText: "Name",
+                                decoration: const InputDecoration(
+                                  labelText: 'Name',
                                 ),
                               ),
                             ],
@@ -97,8 +99,8 @@ class _CategoryFormState extends State<CategoryForm> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: defaultPadding),
-                  padding: EdgeInsets.all(defaultPadding),
+                  margin: const EdgeInsets.only(top: defaultPadding),
+                  padding: const EdgeInsets.all(defaultPadding),
                   decoration: BoxDecoration(
                     border: Border.all(
                         width: 2, color: primaryColor.withOpacity(0.15)),
@@ -108,7 +110,7 @@ class _CategoryFormState extends State<CategoryForm> {
                   ),
                   child: Row(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                         width: 20,
                       ),
@@ -121,8 +123,8 @@ class _CategoryFormState extends State<CategoryForm> {
                             children: [
                               TextFormField(
                                 controller: descriptionController,
-                                decoration: InputDecoration(
-                                  labelText: "Description",
+                                decoration: const InputDecoration(
+                                  labelText: 'Description',
                                 ),
                               ),
                             ],
@@ -133,8 +135,8 @@ class _CategoryFormState extends State<CategoryForm> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: defaultPadding),
-                  padding: EdgeInsets.all(defaultPadding),
+                  margin: const EdgeInsets.only(top: defaultPadding),
+                  padding: const EdgeInsets.all(defaultPadding),
                   decoration: BoxDecoration(
                     border: Border.all(
                         width: 2, color: primaryColor.withOpacity(0.15)),
@@ -144,7 +146,7 @@ class _CategoryFormState extends State<CategoryForm> {
                   ),
                   child: Row(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                         width: 20,
                       ),
@@ -157,8 +159,8 @@ class _CategoryFormState extends State<CategoryForm> {
                             children: [
                               TextFormField(
                                 controller: colorController,
-                                decoration: InputDecoration(
-                                  labelText: "Color",
+                                decoration: const InputDecoration(
+                                  labelText: 'Color',
                                 ),
                               ),
                             ],
@@ -169,8 +171,8 @@ class _CategoryFormState extends State<CategoryForm> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: defaultPadding),
-                  padding: EdgeInsets.all(defaultPadding),
+                  margin: const EdgeInsets.only(top: defaultPadding),
+                  padding: const EdgeInsets.all(defaultPadding),
                   decoration: BoxDecoration(
                     border: Border.all(
                         width: 2, color: primaryColor.withOpacity(0.15)),
@@ -180,7 +182,7 @@ class _CategoryFormState extends State<CategoryForm> {
                   ),
                   child: Row(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                         width: 20,
                       ),
@@ -193,8 +195,8 @@ class _CategoryFormState extends State<CategoryForm> {
                             children: [
                               TextFormField(
                                 controller: iconController,
-                                decoration: InputDecoration(
-                                  labelText: "Icon",
+                                decoration: const InputDecoration(
+                                  labelText: 'Icon',
                                 ),
                               ),
                             ],
@@ -210,12 +212,12 @@ class _CategoryFormState extends State<CategoryForm> {
                       children: <Widget>[
                         Expanded(
                           child: ElevatedButton(
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text("Save"),
+                            child: const Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Text('Save'),
                             ),
                             onPressed: () {
-                              var c = Category(
+                              final c = Category(
                                   id: category.id,
                                   name: nameController.text,
                                   description: descriptionController.text,

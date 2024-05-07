@@ -1,43 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:moneyjar/data/database.dart';
 import 'package:moneyjar/models/account.dart';
+import 'package:moneyjar/models/currency.dart';
 import '../../constants.dart';
 
 class AccountForm extends StatefulWidget {
-  AccountForm({
+  const AccountForm({
     Key? key,
-    required this.account,
+    this.account,
     required this.callback,
   }) : super(key: key);
-  final Account account;
-  final callback;
+  final Account? account;
+  final Function(Account) callback;
 
   @override
-  _AccountFormState createState() =>
-      _AccountFormState(account: this.account, callback: this.callback);
+  State<AccountForm> createState() => _AccountFormState();
 }
 
 class _AccountFormState extends State<AccountForm> {
-  _AccountFormState({
-    required this.account,
-    required this.callback,
-  });
   final List<DropdownMenuItem<int>> types = [
-    DropdownMenuItem(child: Text("Cash"), value: 1),
-    DropdownMenuItem(child: Text("Credit"), value: 2)
+    const DropdownMenuItem(value: 1, child: Text('信用账户')),
+    const DropdownMenuItem(value: 2, child: Text('现金账户')),
+    const DropdownMenuItem(value: 3, child: Text('投资账户'))
   ];
+
+  final List<DropdownMenuItem<String>> currencies = DBProvider
+      .currencies.entries
+      .map((MapEntry<String, Currency> e) =>
+          DropdownMenuItem(value: e.key, child: Text(e.key)))
+      .toList();
   var nameController = TextEditingController();
   var initialController = TextEditingController();
-  var typeSelect;
+  var typeSelect = 1;
   var limitController = TextEditingController();
 
-  Account account;
-  final callback;
+  late Account? account;
+  late Function(Account) callback;
+  @override
+  void initState() {
+    super.initState();
+    account = widget.account;
+    callback = widget.callback;
+    if (account != null && account!.type != 0) {
+      typeSelect = account!.type;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    nameController.text = account.name ?? '';
-    initialController.text = account.initialAmount.toString();
-    typeSelect = account.type ?? 1;
-    limitController.text = account.limitation.toString();
+    account ??= Account();
+    nameController.text = account!.name;
+    initialController.text = (account!.initialAmount / 100.0).toString();
+    typeSelect = account!.type;
+    var currencySelect = account!.currency;
+    limitController.text = (account!.limitation / 100).toString();
     return AlertDialog(
       content: Stack(
         clipBehavior: Clip.none,
@@ -59,10 +75,10 @@ class _AccountFormState extends State<AccountForm> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                SizedBox(height: defaultPadding),
+                const SizedBox(height: defaultPadding),
                 Container(
-                  margin: EdgeInsets.only(top: defaultPadding),
-                  padding: EdgeInsets.all(defaultPadding),
+                  margin: const EdgeInsets.only(top: defaultPadding),
+                  padding: const EdgeInsets.all(defaultPadding),
                   decoration: BoxDecoration(
                     border: Border.all(
                         width: 2, color: primaryColor.withOpacity(0.15)),
@@ -72,7 +88,7 @@ class _AccountFormState extends State<AccountForm> {
                   ),
                   child: Row(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                         width: 20,
                       ),
@@ -85,8 +101,8 @@ class _AccountFormState extends State<AccountForm> {
                             children: [
                               TextFormField(
                                 controller: nameController,
-                                decoration: InputDecoration(
-                                  labelText: "Name",
+                                decoration: const InputDecoration(
+                                  labelText: 'Name',
                                 ),
                               ),
                             ],
@@ -97,8 +113,8 @@ class _AccountFormState extends State<AccountForm> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: defaultPadding),
-                  padding: EdgeInsets.all(defaultPadding),
+                  margin: const EdgeInsets.only(top: defaultPadding),
+                  padding: const EdgeInsets.all(defaultPadding),
                   decoration: BoxDecoration(
                     border: Border.all(
                         width: 2, color: primaryColor.withOpacity(0.15)),
@@ -108,7 +124,7 @@ class _AccountFormState extends State<AccountForm> {
                   ),
                   child: Row(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                         width: 20,
                       ),
@@ -121,8 +137,8 @@ class _AccountFormState extends State<AccountForm> {
                             children: [
                               TextFormField(
                                 controller: initialController,
-                                decoration: InputDecoration(
-                                  labelText: "Initial",
+                                decoration: const InputDecoration(
+                                  labelText: 'Initial',
                                 ),
                               ),
                             ],
@@ -133,8 +149,8 @@ class _AccountFormState extends State<AccountForm> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: defaultPadding),
-                  padding: EdgeInsets.all(defaultPadding),
+                  margin: const EdgeInsets.only(top: defaultPadding),
+                  padding: const EdgeInsets.all(defaultPadding),
                   decoration: BoxDecoration(
                     border: Border.all(
                         width: 2, color: primaryColor.withOpacity(0.15)),
@@ -144,7 +160,7 @@ class _AccountFormState extends State<AccountForm> {
                   ),
                   child: Row(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                         width: 20,
                       ),
@@ -170,8 +186,8 @@ class _AccountFormState extends State<AccountForm> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: defaultPadding),
-                  padding: EdgeInsets.all(defaultPadding),
+                  margin: const EdgeInsets.only(top: defaultPadding),
+                  padding: const EdgeInsets.all(defaultPadding),
                   decoration: BoxDecoration(
                     border: Border.all(
                         width: 2, color: primaryColor.withOpacity(0.15)),
@@ -181,7 +197,44 @@ class _AccountFormState extends State<AccountForm> {
                   ),
                   child: Row(
                     children: [
-                      SizedBox(
+                      const SizedBox(
+                        height: 20,
+                        width: 20,
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: defaultPadding),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              DropdownButtonFormField<String>(
+                                value: currencySelect,
+                                onChanged: (currency) {
+                                  currencySelect = currency!;
+                                },
+                                items: currencies,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top: defaultPadding),
+                  padding: const EdgeInsets.all(defaultPadding),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        width: 2, color: primaryColor.withOpacity(0.15)),
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(defaultPadding),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const SizedBox(
                         height: 20,
                         width: 20,
                       ),
@@ -194,8 +247,8 @@ class _AccountFormState extends State<AccountForm> {
                             children: [
                               TextFormField(
                                 controller: limitController,
-                                decoration: InputDecoration(
-                                  labelText: "Limit",
+                                decoration: const InputDecoration(
+                                  labelText: 'Limit',
                                 ),
                               ),
                             ],
@@ -211,21 +264,28 @@ class _AccountFormState extends State<AccountForm> {
                       children: <Widget>[
                         Expanded(
                           child: ElevatedButton(
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text("Save"),
+                            child: const Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Text('Save'),
                             ),
                             onPressed: () {
-                              var a = Account(
-                                  id: account.id,
+                              final a = Account(
+                                  id: account?.id,
                                   name: nameController.text,
                                   initialAmount:
-                                      double.parse(initialController.text),
+                                      (double.parse(initialController.text) *
+                                              100)
+                                          .round(),
                                   type: typeSelect,
+                                  currency: currencySelect,
                                   limitation:
-                                      double.parse(limitController.text));
-                              a.transactionCount = account.transactionCount;
-                              a.transactionAmount = account.transactionAmount;
+                                      (double.parse(limitController.text) * 100)
+                                          .round());
+                              if (account != null) {
+                                a.transactionCount = account!.transactionCount;
+                                a.transactionAmount =
+                                    account!.transactionAmount;
+                              }
                               callback(a);
                               Navigator.of(context).pop();
                             },

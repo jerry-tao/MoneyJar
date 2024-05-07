@@ -1,30 +1,34 @@
-import 'package:moneyjar/models/category.dart';
 import 'package:flutter/material.dart';
+import 'package:moneyjar/models/category.dart';
 
 import '../../../constants.dart';
 import '../../responsive.dart';
 import 'category_grid_view.dart';
 
 class CategoryTable extends StatefulWidget {
-  final List<Category> categories;
   const CategoryTable({
     required this.categories,
     Key? key,
   }) : super(key: key);
+  final List<Category> categories;
 
   @override
-  _CategoryTableState createState() =>
-      _CategoryTableState(categories: categories);
+  State<CategoryTable> createState() => _CategoryTableState();
 }
 
 class _CategoryTableState extends State<CategoryTable> {
-  List<Category> categories;
-  _CategoryTableState({required this.categories});
+  late List<Category> categories;
+  @override
+  void initState() {
+    super.initState();
+    categories = widget.categories;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Size _size = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
     return SingleChildScrollView(
-      padding: EdgeInsets.all(defaultPadding),
+      padding: const EdgeInsets.all(defaultPadding),
       // decoration: BoxDecoration(
       // color: secondaryColor,
       // borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -34,20 +38,20 @@ class _CategoryTableState extends State<CategoryTable> {
         children: [
           Column(
             children: [
-              SizedBox(height: defaultPadding),
+              const SizedBox(height: defaultPadding),
               Responsive(
                 mobile: CategoryGridView(
                   categories: categories,
-                  crossAxisCount: _size.width < 650 ? 2 : 4,
+                  crossAxisCount: size.width < 650 ? 2 : 4,
                   childAspectRatio:
-                      _size.width < 650 && _size.width > 350 ? 1.3 : 1,
+                      size.width < 650 && size.width > 350 ? 1.3 : 1,
                 ),
                 tablet: CategoryGridView(
                   categories: categories,
                 ),
                 desktop: CategoryGridView(
                   categories: categories,
-                  childAspectRatio: _size.width < 1400 ? 1.1 : 1.4,
+                  childAspectRatio: size.width < 1400 ? 1.1 : 1.4,
                 ),
               ),
             ],

@@ -2,24 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:graphic/graphic.dart';
 
 class PieCard2 extends StatelessWidget {
-  final List<Map<String, dynamic>> kvs;
   const PieCard2({
     Key? key,
     required this.kvs,
   }) : super(key: key);
+  final List<Map<String, dynamic>> kvs;
 
   @override
   Widget build(BuildContext context) {
-    var top10 = kvs.sublist(0, kvs.length > 9 ? 9 : kvs.length);
+    final top10 = kvs.sublist(0, kvs.length > 9 ? 9 : kvs.length);
     if (kvs.length > 9) {
-      var rest = kvs.sublist(9);
+      final rest = kvs.sublist(9);
       top10.add({
-        "name": "Other",
-        "value": double.parse(rest.fold(0, (previousValue, element) {
+        'name': 'Other',
+        'value': double.parse(rest.fold(0, (previousValue, element) {
           return (previousValue as num) + element['value'];
         }).toStringAsFixed(2))
       });
-      top10.sort((a, b) => a['value'].compareTo(b['value']));
+      top10.sort((a, b) => (a['value'] as double).compareTo(b['value']));
     }
 
     return Container(
@@ -33,7 +33,7 @@ class PieCard2 extends StatelessWidget {
             },
           ),
           'Amount': Variable(
-            accessor: (Map map) => map['value'].abs() as num,
+            accessor: (Map map) => (map['value'] as num).abs(),
           ),
         },
         transforms: [
@@ -44,22 +44,30 @@ class PieCard2 extends StatelessWidget {
         ],
         marks: [
           IntervalMark(
-            label: LabelEncode(
-                encoder: (tuple) => Label(
-                      tuple["Amount"].toString(),
-                      LabelStyle(textStyle: Defaults.runeStyle),
-                    )),
-            position: Varset('percent') / Varset('Category'),
-            color: ColorEncode(variable: 'Category', values: Defaults.colors10),
-            modifiers: [StackModifier()],
-          )
+              label: LabelEncode(
+                  encoder: (tuple) => Label(
+                        tuple['Amount'].toString(),
+                        LabelStyle(textStyle: Defaults.runeStyle),
+                      )),
+              position: Varset('percent') / Varset('Category'),
+              color:
+                  ColorEncode(variable: 'Category', values: Defaults.colors10),
+              modifiers: [StackModifier()],
+              // TODO hover rebuild.
+              // transition: Transition(duration: const Duration(seconds: 2)),
+              entrance: {MarkEntrance.y})
         ],
         coord: PolarCoord(
           transposed: true,
           dimCount: 1,
           startRadius: 0.4,
         ),
-        selections: {'tap': PointSelection()},
+        selections: {
+          // TODO inner circle selection wrong.
+          'hover': PointSelection(
+            on: {GestureType.hover, GestureType.longPressMoveUpdate},
+          )
+        },
         tooltip: TooltipGuide(renderer: centralPieLabel),
       ),
     );
@@ -71,11 +79,9 @@ class PieCard2 extends StatelessWidget {
     Map<int, Tuple> selectedTuples,
   ) {
     final tuple = selectedTuples.values.last;
-    print("size is $size");
-    print("offset is $anchor");
     final titleElement = LabelElement(
         text: '${tuple['Category']}\n',
-        anchor:  Offset(size.width/2, size.height/2),
+        anchor: Offset(size.width / 2, size.height / 2),
         style: LabelStyle(
             textStyle: const TextStyle(
               fontSize: 14,
@@ -83,8 +89,8 @@ class PieCard2 extends StatelessWidget {
             align: Alignment.topCenter));
 
     final valueElement = LabelElement(
-        text: (tuple['percent'] * 100 as double).toStringAsFixed(2) + '%',
-        anchor:  Offset(size.width/2, size.height/2),
+        text: '${((tuple['percent'] as double) * 100).toStringAsFixed(2)}%',
+        anchor: Offset(size.width / 2, size.height / 2),
         style: LabelStyle(
             textStyle: const TextStyle(
               fontSize: 24,
@@ -96,24 +102,24 @@ class PieCard2 extends StatelessWidget {
 }
 
 class BarCard2 extends StatelessWidget {
-  final List<Map<String, dynamic>> kvs;
   const BarCard2({
     Key? key,
     required this.kvs,
   }) : super(key: key);
+  final List<Map<String, dynamic>> kvs;
 
   @override
   Widget build(BuildContext context) {
-    var top10 = kvs.sublist(0, kvs.length > 9 ? 9 : kvs.length);
+    final top10 = kvs.sublist(0, kvs.length > 9 ? 9 : kvs.length);
     if (kvs.length > 9) {
-      var rest = kvs.sublist(9);
+      final rest = kvs.sublist(9);
       top10.add({
-        "name": "Other",
-        "value": double.parse(rest.fold(0, (previousValue, element) {
+        'name': 'Other',
+        'value': double.parse(rest.fold(0, (previousValue, element) {
           return (previousValue as num) + element['value'];
         }).toStringAsFixed(2))
       });
-      top10.sort((a, b) => a['value'].compareTo(b['value']));
+      top10.sort((a, b) => (b['value'] as double).compareTo(a['value']));
     }
     return Container(
       margin: const EdgeInsets.only(top: 10),
@@ -126,7 +132,7 @@ class BarCard2 extends StatelessWidget {
             },
           ),
           'Amount': Variable(
-            accessor: (Map map) => map['value'].abs() as num,
+            accessor: (Map map) => (map['value'] as double).abs() as num,
           ),
         },
         marks: [
@@ -160,9 +166,7 @@ class BarCard2 extends StatelessWidget {
         ],
         coord: RectCoord(transposed: true),
         axes: [
-          Defaults.verticalAxis
-            ..line = Defaults.strokeStyle
-            ..grid = null,
+          Defaults.verticalAxis..grid = null,
           Defaults.horizontalAxis
             ..line = null
             ..grid = Defaults.strokeStyle,

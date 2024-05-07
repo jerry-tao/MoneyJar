@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
 class RefreshContext extends InheritedWidget {
-  final refresh;
+  const RefreshContext({Key? key, required this.refresh, required Widget child})
+      : super(key: key, child: child);
+  final Function(Widget, String) refresh;
 
-  RefreshContext({required this.refresh, required Widget child})
-      : super(child: child);
+  void refreshWidget(Widget widget, String title) {
+    refresh(widget, title);
+  }
 
   @override
   bool updateShouldNotify(covariant InheritedWidget oldWidget) {

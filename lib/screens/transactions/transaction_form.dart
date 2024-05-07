@@ -1,48 +1,64 @@
+import 'package:flutter/material.dart';
 import 'package:moneyjar/data/database.dart';
 import 'package:moneyjar/models/account.dart';
 import 'package:moneyjar/models/category.dart';
 import 'package:moneyjar/models/transaction.dart';
-import 'package:flutter/material.dart';
 
 import '../../constants.dart';
 
 class TransactionForm extends StatefulWidget {
+  const TransactionForm(
+      {Key? key, required this.transaction, required this.callback})
+      : super(key: key);
   final Transaction transaction;
-  final callback;
-  TransactionForm({required this.transaction, required this.callback});
+  final Function() callback;
   @override
-  TransactionFormState createState() =>
-      TransactionFormState(transaction: transaction, callback: callback);
+  TransactionFormState createState() => TransactionFormState();
 }
 
 class TransactionFormState extends State<TransactionForm> {
-  Transaction transaction;
-  final callback;
-  TransactionFormState({required this.transaction, required this.callback});
+  late Transaction transaction;
+  late Function() callback;
   List<DropdownMenuItem<Category>>? _categories;
   List<DropdownMenuItem<Account>>? _accounts;
   final List<DropdownMenuItem<int>> types = [
-    DropdownMenuItem(child: Text("Expense"), value: 1),
-    DropdownMenuItem(child: Text("Income"), value: 2),
-    DropdownMenuItem(child: Text("Transfer"), value: 3)
+    const DropdownMenuItem(value: 1, child: Text('支出')),
+    const DropdownMenuItem(value: 2, child: Text('收入')),
+    const DropdownMenuItem(value: 3, child: Text('转移'))
   ];
   Future<void>? future;
   @override
-  initState() {
-    future = loadData();
+  void initState() {
     super.initState();
+    future = loadData();
+    transaction = widget.transaction;
+    callback = widget.callback;
     dateSelect = DateTime.now();
     dateShow = dateSelect.toString().substring(0, 19);
+
+    dateSelect = DateTime.now();
+    if (transaction.id != null) {
+      descriptionController.text = transaction.description.toString();
+      amountController.text = (transaction.amount! / 100.0).toString();
+      dateSelect = transaction.date?.toLocal() ?? DateTime.now();
+      dateShow = dateSelect.toString().substring(0, 19);
+      targetController.text = transaction.target.toString();
+      typeSelect = transaction.type!;
+      categorySelect = transaction.categoryID!;
+      accountSelect = transaction.accountID!;
+      tagController.text = transaction.tag.toString();
+      remarkController.text = transaction.remark.toString();
+    }
   }
 
   var descriptionController = TextEditingController();
   var amountController = TextEditingController();
-  var dateSelect;
-  var dateShow;
-  var typeSelect = 1;
+  late DateTime dateSelect;
+  late String dateShow;
+  late int typeSelect;
   var targetController = TextEditingController();
-  var categorySelect;
-  var accountSelect;
+  late int categorySelect;
+  late int accountSelect;
   var tagController = TextEditingController();
   var remarkController = TextEditingController();
 
@@ -52,21 +68,6 @@ class TransactionFormState extends State<TransactionForm> {
         future: future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            categorySelect = _categories![0].value!.id!;
-            accountSelect = _accounts![0].value!.id!;
-            dateSelect = DateTime.now();
-            if (transaction.id != null) {
-              descriptionController.text = transaction.description.toString();
-              amountController.text = transaction.amount.toString();
-              dateSelect = transaction.date;
-              dateShow = dateSelect.toString().substring(0, 19);
-              typeSelect = transaction.type!;
-              targetController.text = transaction.target.toString();
-              categorySelect = transaction.category_id;
-              accountSelect = transaction.account_id;
-              tagController.text = transaction.tag.toString();
-              remarkController.text = transaction.remark.toString();
-            }
             return AlertDialog(
                 content: Stack(
               clipBehavior: Clip.none,
@@ -87,19 +88,19 @@ class TransactionFormState extends State<TransactionForm> {
                 SingleChildScrollView(
                   child: Container(
                     width: 600,
-                    padding: EdgeInsets.all(defaultPadding),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.all(defaultPadding),
+                    decoration: const BoxDecoration(
                       color: secondaryColor,
-                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
                     child: Form(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: defaultPadding),
+                          const SizedBox(height: defaultPadding),
                           Container(
-                            margin: EdgeInsets.only(top: defaultPadding),
-                            padding: EdgeInsets.all(defaultPadding),
+                            margin: const EdgeInsets.only(top: defaultPadding),
+                            padding: const EdgeInsets.all(defaultPadding),
                             decoration: BoxDecoration(
                               border: Border.all(
                                   width: 2,
@@ -110,7 +111,7 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                             child: Row(
                               children: [
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                   width: 20,
                                 ),
@@ -124,8 +125,8 @@ class TransactionFormState extends State<TransactionForm> {
                                       children: [
                                         TextFormField(
                                           controller: descriptionController,
-                                          decoration: InputDecoration(
-                                            labelText: "Description",
+                                          decoration: const InputDecoration(
+                                            labelText: 'Description',
                                           ),
                                         ),
                                       ],
@@ -136,8 +137,8 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                           ),
                           Container(
-                            margin: EdgeInsets.only(top: defaultPadding),
-                            padding: EdgeInsets.all(defaultPadding),
+                            margin: const EdgeInsets.only(top: defaultPadding),
+                            padding: const EdgeInsets.all(defaultPadding),
                             decoration: BoxDecoration(
                               border: Border.all(
                                   width: 2,
@@ -148,7 +149,7 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                             child: Row(
                               children: [
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                   width: 20,
                                 ),
@@ -162,8 +163,8 @@ class TransactionFormState extends State<TransactionForm> {
                                       children: [
                                         TextFormField(
                                           controller: amountController,
-                                          decoration: InputDecoration(
-                                            labelText: "Amount",
+                                          decoration: const InputDecoration(
+                                            labelText: 'Amount',
                                           ),
                                         ),
                                       ],
@@ -174,8 +175,8 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                           ),
                           Container(
-                            margin: EdgeInsets.only(top: defaultPadding),
-                            padding: EdgeInsets.all(defaultPadding),
+                            margin: const EdgeInsets.only(top: defaultPadding),
+                            padding: const EdgeInsets.all(defaultPadding),
                             decoration: BoxDecoration(
                               border: Border.all(
                                   width: 2,
@@ -186,7 +187,7 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                             child: Row(
                               children: [
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                   width: 20,
                                 ),
@@ -200,8 +201,8 @@ class TransactionFormState extends State<TransactionForm> {
                                       children: [
                                         TextFormField(
                                           controller: targetController,
-                                          decoration: InputDecoration(
-                                            labelText: "Target",
+                                          decoration: const InputDecoration(
+                                            labelText: 'Target',
                                           ),
                                         ),
                                       ],
@@ -212,8 +213,8 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                           ),
                           Container(
-                            margin: EdgeInsets.only(top: defaultPadding),
-                            padding: EdgeInsets.all(defaultPadding),
+                            margin: const EdgeInsets.only(top: defaultPadding),
+                            padding: const EdgeInsets.all(defaultPadding),
                             decoration: BoxDecoration(
                               border: Border.all(
                                   width: 2,
@@ -224,7 +225,7 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                             child: Row(
                               children: [
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                   width: 20,
                                 ),
@@ -251,8 +252,8 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                           ),
                           Container(
-                            margin: EdgeInsets.only(top: defaultPadding),
-                            padding: EdgeInsets.all(defaultPadding),
+                            margin: const EdgeInsets.only(top: defaultPadding),
+                            padding: const EdgeInsets.all(defaultPadding),
                             decoration: BoxDecoration(
                               border: Border.all(
                                   width: 2,
@@ -263,7 +264,7 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                             child: Row(
                               children: [
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                   width: 20,
                                 ),
@@ -281,12 +282,13 @@ class TransactionFormState extends State<TransactionForm> {
                                             // 调用函数打开
                                             showDatePicker(
                                               context: context,
-                                              initialDate: new DateTime.now(),
-                                              firstDate: new DateTime.now()
-                                                  .subtract(new Duration(
-                                                      days: 30)), // 减 30 天
-                                              lastDate: new DateTime.now().add(
-                                                  new Duration(
+                                              initialDate: DateTime.now(),
+                                              firstDate: DateTime.now()
+                                                  .subtract(const Duration(
+                                                      days:
+                                                          365 * 10)), // 减 30 天
+                                              lastDate: DateTime.now().add(
+                                                  const Duration(
                                                       days: 30)), // 加 30 天
                                             ).then((DateTime? val) {
                                               if (val == null) return;
@@ -296,7 +298,7 @@ class TransactionFormState extends State<TransactionForm> {
                                                           .fromDateTime(
                                                               dateSelect))
                                                   .then((value) {
-                                                val = new DateTime(
+                                                val = DateTime(
                                                     val!.year,
                                                     val!.month,
                                                     val!.day,
@@ -319,8 +321,8 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                           ),
                           Container(
-                            margin: EdgeInsets.only(top: defaultPadding),
-                            padding: EdgeInsets.all(defaultPadding),
+                            margin: const EdgeInsets.only(top: defaultPadding),
+                            padding: const EdgeInsets.all(defaultPadding),
                             decoration: BoxDecoration(
                               border: Border.all(
                                   width: 2,
@@ -331,7 +333,7 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                             child: Row(
                               children: [
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                   width: 20,
                                 ),
@@ -344,7 +346,11 @@ class TransactionFormState extends State<TransactionForm> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         DropdownButtonFormField<Category>(
-                                          value: _categories![0].value,
+                                          value: _categories!
+                                              .firstWhere((element) =>
+                                                  element.value!.id ==
+                                                  categorySelect)
+                                              .value!,
                                           onChanged: (category) {
                                             categorySelect = category!.id!;
                                           },
@@ -358,8 +364,8 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                           ),
                           Container(
-                            margin: EdgeInsets.only(top: defaultPadding),
-                            padding: EdgeInsets.all(defaultPadding),
+                            margin: const EdgeInsets.only(top: defaultPadding),
+                            padding: const EdgeInsets.all(defaultPadding),
                             decoration: BoxDecoration(
                               border: Border.all(
                                   width: 2,
@@ -370,7 +376,7 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                             child: Row(
                               children: [
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                   width: 20,
                                 ),
@@ -383,7 +389,11 @@ class TransactionFormState extends State<TransactionForm> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         DropdownButtonFormField<Account>(
-                                          value: _accounts![0].value!,
+                                          value: _accounts!
+                                              .firstWhere((element) =>
+                                                  element.value!.id ==
+                                                  accountSelect)
+                                              .value!,
                                           onChanged: (account) {
                                             accountSelect = account!.id!;
                                           },
@@ -397,8 +407,8 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                           ),
                           Container(
-                            margin: EdgeInsets.only(top: defaultPadding),
-                            padding: EdgeInsets.all(defaultPadding),
+                            margin: const EdgeInsets.only(top: defaultPadding),
+                            padding: const EdgeInsets.all(defaultPadding),
                             decoration: BoxDecoration(
                               border: Border.all(
                                   width: 2,
@@ -409,7 +419,7 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                             child: Row(
                               children: [
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                   width: 20,
                                 ),
@@ -423,8 +433,8 @@ class TransactionFormState extends State<TransactionForm> {
                                       children: [
                                         TextFormField(
                                           controller: tagController,
-                                          decoration: InputDecoration(
-                                            labelText: "Tag",
+                                          decoration: const InputDecoration(
+                                            labelText: 'Tag',
                                           ),
                                         ),
                                       ],
@@ -435,8 +445,8 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                           ),
                           Container(
-                            margin: EdgeInsets.only(top: defaultPadding),
-                            padding: EdgeInsets.all(defaultPadding),
+                            margin: const EdgeInsets.only(top: defaultPadding),
+                            padding: const EdgeInsets.all(defaultPadding),
                             decoration: BoxDecoration(
                               border: Border.all(
                                   width: 2,
@@ -447,7 +457,7 @@ class TransactionFormState extends State<TransactionForm> {
                             ),
                             child: Row(
                               children: [
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                   width: 20,
                                 ),
@@ -461,8 +471,8 @@ class TransactionFormState extends State<TransactionForm> {
                                       children: [
                                         TextFormField(
                                           controller: remarkController,
-                                          decoration: InputDecoration(
-                                            labelText: "Remark",
+                                          decoration: const InputDecoration(
+                                            labelText: 'Remark',
                                           ),
                                         ),
                                       ],
@@ -478,22 +488,24 @@ class TransactionFormState extends State<TransactionForm> {
                                 children: <Widget>[
                                   Expanded(
                                     child: ElevatedButton(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Text("Save"),
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(16.0),
+                                        child: Text('Save'),
                                       ),
                                       onPressed: () {
                                         // Save
-                                        var t = Transaction(
+                                        final t = Transaction(
                                             id: transaction.id,
                                             description:
                                                 descriptionController.text,
-                                            amount: double.parse(
-                                                amountController.text),
+                                            amount: (double.parse(
+                                                        amountController.text) *
+                                                    100)
+                                                .round(),
                                             date: dateSelect,
                                             type: typeSelect,
-                                            category_id: categorySelect,
-                                            account_id: accountSelect,
+                                            categoryID: categorySelect,
+                                            accountID: accountSelect,
                                             tag: tagController.text,
                                             target: targetController.text,
                                             remark: remarkController.text);
@@ -518,13 +530,15 @@ class TransactionFormState extends State<TransactionForm> {
           }
           return Scaffold(
             appBar: AppBar(
-                elevation: 0, centerTitle: true, title: Text("Transaction")),
+                elevation: 0,
+                centerTitle: true,
+                title: const Text('Transaction')),
             body: SafeArea(
               child: Container(
-                padding: EdgeInsets.all(defaultPadding),
-                decoration: BoxDecoration(
+                padding: const EdgeInsets.all(defaultPadding),
+                decoration: const BoxDecoration(
                   color: secondaryColor,
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
               ),
             ),
@@ -532,7 +546,7 @@ class TransactionFormState extends State<TransactionForm> {
         });
   }
 
-  update(val) {
+  void update(val) {
     setState(() {
       dateSelect = val;
       dateShow = dateSelect.toString().substring(0, 19);
@@ -540,21 +554,27 @@ class TransactionFormState extends State<TransactionForm> {
   }
 
   Future<void> loadData() async {
-    var clist = await DBProvider.db.getCategories();
-    var alist = await DBProvider.db.getAccounts();
+    final clist = await DBProvider.db.getCategories();
+    final alist = await DBProvider.db.getAccounts();
     _categories = clist.map<DropdownMenuItem<Category>>((category) {
       return DropdownMenuItem<Category>(
         key: ValueKey<int>(category.id!),
-        child: Text("${category.name}"),
         value: category,
+        child: Text('${category.name}'),
       );
     }).toList();
     _accounts = alist.map<DropdownMenuItem<Account>>((account) {
       return DropdownMenuItem<Account>(
         key: ValueKey<int>(account.id!),
-        child: Text("${account.name}"),
         value: account,
+        child: Text(account.name),
       );
     }).toList();
+    if (categorySelect == 0) {
+      categorySelect = _categories![0].value!.id!;
+    }
+    if (accountSelect == 0) {
+      accountSelect = _accounts![0].value!.id!;
+    }
   }
 }

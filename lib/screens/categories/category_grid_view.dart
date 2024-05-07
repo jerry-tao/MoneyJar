@@ -1,35 +1,37 @@
-import 'package:moneyjar/models/category.dart';
 import 'package:flutter/material.dart';
+import 'package:moneyjar/controllers/refresh.dart';
 import 'package:moneyjar/data/database.dart';
+import 'package:moneyjar/models/category.dart';
 import 'package:moneyjar/screens/categories/category_form.dart';
-import 'package:moneyjar/screens/categories/category_screen.dart';
-import 'package:moneyjar/screens/components/refresh.dart';
+import 'package:moneyjar/screens/categories/category_view.dart';
+
 import '../../constants.dart';
 
 class CategoryGridView extends StatefulWidget {
+  const CategoryGridView(
+      {Key? key,
+      required this.categories,
+      this.crossAxisCount = 4,
+      this.childAspectRatio = 1})
+      : super(key: key);
   final List<Category> categories;
   final int crossAxisCount;
   final double childAspectRatio;
-  CategoryGridView(
-      {required this.categories,
-      this.crossAxisCount = 4,
-      this.childAspectRatio = 1});
   @override
-  _CategoryGridViewState createState() => _CategoryGridViewState(
-      categories: categories,
-      crossAxisCount: crossAxisCount,
-      childAspectRatio: childAspectRatio);
+  State<CategoryGridView> createState() => _CategoryGridViewState();
 }
 
 class _CategoryGridViewState extends State<CategoryGridView> {
-  _CategoryGridViewState({
-    required this.categories,
-    this.crossAxisCount = 4,
-    this.childAspectRatio = 1,
-  });
-  List<Category> categories;
-  final int crossAxisCount;
-  final double childAspectRatio;
+  late List<Category> categories;
+  late int crossAxisCount = 4;
+  late double childAspectRatio = 1;
+  @override
+  void initState() {
+    super.initState();
+    categories = widget.categories;
+    crossAxisCount = widget.crossAxisCount;
+    childAspectRatio = widget.childAspectRatio;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,10 +46,10 @@ class _CategoryGridViewState extends State<CategoryGridView> {
         childAspectRatio: childAspectRatio,
       ),
       itemBuilder: (context, index) => Container(
-        padding: EdgeInsets.all(defaultPadding),
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.all(defaultPadding),
+        decoration: const BoxDecoration(
           color: secondaryColor,
-          borderRadius: const BorderRadius.all(Radius.circular(10)),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,14 +68,14 @@ class _CategoryGridViewState extends State<CategoryGridView> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${categories[index].transactionCount} Transactions",
+                  '${categories[index].transactionCount} Transactions',
                   style: Theme.of(context)
                       .textTheme
                       .bodySmall!
                       .copyWith(color: Colors.white70),
                 ),
                 Text(
-                  categories[index].amount?.toString() ?? '0.0',
+                  (categories[index].amount! / 100.0).toString(),
                   style: Theme.of(context)
                       .textTheme
                       .bodySmall!
@@ -84,15 +86,15 @@ class _CategoryGridViewState extends State<CategoryGridView> {
             Row(
               children: [
                 IconButton(
-                  icon: Icon(Icons.remove_red_eye),
+                  icon: const Icon(Icons.remove_red_eye),
                   onPressed: () {
-                    RefreshContext.of(context)!.refresh(
-                        CategoryScreen(category: categories[index]),
+                    RefreshContext.of(context)!.refreshWidget(
+                        CategoryView(category: categories[index]),
                         categories[index].name!);
                   },
                 ),
                 IconButton(
-                  icon: Icon(Icons.edit),
+                  icon: const Icon(Icons.edit),
                   onPressed: () {
                     showDialog<void>(
                         context: context,
@@ -108,7 +110,7 @@ class _CategoryGridViewState extends State<CategoryGridView> {
                   },
                 ),
                 IconButton(
-                  icon: Icon(Icons.delete),
+                  icon: const Icon(Icons.delete),
                   onPressed: () {
                     DBProvider.db.deleteCategory(categories[index].id!);
                     setState(() {

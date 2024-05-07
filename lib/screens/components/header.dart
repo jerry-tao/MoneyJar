@@ -1,16 +1,16 @@
-import 'package:moneyjar/controllers/menu_app_contoller.dart';
-import 'package:moneyjar/responsive.dart';
 import 'package:flutter/material.dart';
+import 'package:moneyjar/controllers/menu_app_contoller.dart';
+import 'package:moneyjar/controllers/refresh.dart';
+import 'package:moneyjar/responsive.dart';
 import 'package:moneyjar/screens/transactions/transaction_table.dart';
-import 'package:moneyjar/screens/transactions/transactions.dart';
-import 'package:moneyjar/screens/components/refresh.dart';
+import 'package:moneyjar/screens/transactions/transactions_view.dart';
 import 'package:provider/provider.dart';
 
 import '../../constants.dart';
 
 class Header extends StatelessWidget {
-  final String title;
   const Header({Key? key, required this.title}) : super(key: key);
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -18,29 +18,29 @@ class Header extends StatelessWidget {
       children: [
         if (!Responsive.isDesktop(context))
           IconButton(
-            icon: Icon(Icons.menu),
+            icon: const Icon(Icons.menu),
             onPressed: context.read<MenuAppController>().controlMenu,
           ),
         if (!Responsive.isMobile(context))
           Text(
-            this.title,
+            title,
             style: Theme.of(context).textTheme.titleLarge,
           ),
         if (!Responsive.isMobile(context))
           Spacer(flex: Responsive.isDesktop(context) ? 2 : 1),
-        Expanded(child: SearchField())
+        const Expanded(child: SearchField())
       ],
     );
   }
 }
 
 class SearchField extends StatefulWidget {
-  SearchField({
+  const SearchField({
     Key? key,
   }) : super(key: key);
 
   @override
-  _SearchFieldState createState() => _SearchFieldState();
+  State<SearchField> createState() => _SearchFieldState();
 }
 
 class _SearchFieldState extends State<SearchField> {
@@ -53,29 +53,29 @@ class _SearchFieldState extends State<SearchField> {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
-        hintText: "Search",
+        hintText: 'Search',
         fillColor: secondaryColor,
         filled: true,
-        border: OutlineInputBorder(
+        border: const OutlineInputBorder(
           borderSide: BorderSide.none,
-          borderRadius: const BorderRadius.all(Radius.circular(10)),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
         suffixIcon: InkWell(
           onTap: () {
-            RefreshContext.of(context)!.refresh(
-                Transactions(
+            RefreshContext.of(context)!.refreshWidget(
+                TransactionsView(
                   params: QueryParams(search: controller.text),
                 ),
-                "Search Results for ${controller.text}");
+                'Search Results for ${controller.text}');
           },
           child: Container(
-            padding: EdgeInsets.all(defaultPadding * 0.75),
-            margin: EdgeInsets.symmetric(horizontal: defaultPadding / 2),
-            decoration: BoxDecoration(
+            padding: const EdgeInsets.all(defaultPadding * 0.75),
+            margin: const EdgeInsets.symmetric(horizontal: defaultPadding / 2),
+            decoration: const BoxDecoration(
               color: primaryColor,
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
+              borderRadius: BorderRadius.all(Radius.circular(10)),
             ),
-            child: Icon(Icons.search),
+            child: const Icon(Icons.search),
           ),
         ),
       ),

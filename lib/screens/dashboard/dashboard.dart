@@ -1,20 +1,20 @@
+import 'package:flutter/material.dart';
+import 'package:moneyjar/data/database.dart';
 import 'package:moneyjar/responsive.dart';
 import 'package:moneyjar/screens/components/card_grid.dart';
 import 'package:moneyjar/screens/transactions/transaction_table.dart';
-import 'package:flutter/material.dart';
-import 'package:moneyjar/data/database.dart';
 
 import '../../constants.dart';
 
 class DashboardScreen extends StatelessWidget {
-  DashboardScreen();
+  const DashboardScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        DashboardWidget(),
-        SizedBox(height: defaultPadding),
+        const DashboardWidget(),
+        const SizedBox(height: defaultPadding),
         Expanded(
             child: TransactionTable(
           params: QueryParams(),
@@ -30,7 +30,7 @@ class DashboardWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _DashboardWidgetState createState() => _DashboardWidgetState();
+  State<DashboardWidget> createState() => _DashboardWidgetState();
 }
 
 class _DashboardWidgetState extends State<DashboardWidget> {
@@ -44,21 +44,21 @@ class _DashboardWidgetState extends State<DashboardWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final Size _size = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
     return FutureBuilder(
         future: _data,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return Column(
               children: [
-                SizedBox(height: defaultPadding),
+                const SizedBox(height: defaultPadding),
                 Responsive(
                   mobile: InfoCardGridView(
                     data:
                         (snapshot.data as Map<String, String>).entries.toList(),
-                    crossAxisCount: _size.width < 650 ? 2 : 4,
+                    crossAxisCount: size.width < 650 ? 2 : 4,
                     childAspectRatio:
-                        _size.width < 650 && _size.width > 350 ? 1.3 : 1,
+                        size.width < 650 && size.width > 350 ? 1.3 : 1,
                   ),
                   tablet: InfoCardGridView(
                     data:
@@ -67,13 +67,13 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   desktop: InfoCardGridView(
                     data:
                         (snapshot.data as Map<String, String>).entries.toList(),
-                    childAspectRatio: _size.width < 1400 ? 1.1 : 1.4,
+                    childAspectRatio: size.width < 1400 ? 1.1 : 1.4,
                   ),
                 ),
               ],
             );
           } else {
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           }
         });
   }

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(flutter_admin_portal LANGUAGES CXX)
+project(MoneyJar LANGUAGES CXX)
 
 set(BINARY_NAME "FAP")
 

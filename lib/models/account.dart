@@ -1,77 +1,82 @@
 class Account {
-  static const CreditAccountType = 1;
-  static const CashAccountType = 2;
-  static const InvestmentAccountType = 3;
+  Account(
+      {this.id,
+      this.name = '',
+      this.type = 1,
+      this.archived = false,
+      this.currency = 'CNY',
+      this.initialAmount = 0,
+      this.limitation = 0});
+
+  factory Account.fromDBMap(Map<String, dynamic> map) {
+    final a = Account(
+        id: map['id'],
+        name: map['name'],
+        currency: map['currency'],
+        type: map['type'],
+        archived: map['archived'] == 1,
+        initialAmount: (map['initial_amount'] as num).toInt(),
+        limitation: (map['limitation'] as num).toInt());
+    a.transactionCount = map['transaction_count'];
+    a.transactionAmount = map['total_amount'] as int? ?? 0;
+    return a;
+  }
+  static const creditAccountType = 1;
+  static const cashAccountType = 2;
+  static const investmentAccountType = 3;
 
   int? id;
-  /**
-   * 1: cash/bank, 2: credit/loan in future we may support invest and other types
-   */
-  int? type;
-  /**
-   * account name
-   */
-  String? name;
-  /**
-   * account initial amount, should be decimal
-   */
-  double? initialAmount; //  should be decimal
-  /**
-   * credit limit, only used when account type is credit ,should be decimal
-   */
-  double? limitation; // credit limit should be decimal
+
+  /// 1: cash/bank, 2: credit/loan in future we may support invest and other types
+  int type = 0;
+
+  /// account name
+  String name = '';
+
+  /// account initial amount, should be decimal
+  int initialAmount = 0; //  should be decimal
+  /// credit limit, only used when account type is credit ,should be decimal
+  int limitation = 0; // credit limit should be decimal
 
   bool archived = false;
-  //  final currency; // not support for now
-  /**
-   * transaction count, this is dynamic from database.
-   */
-  int? transactionCount;
-  double? transactionAmount;
+  String currency = 'CNY';
 
-  /**
-   * remain amount, this is dynamic from database.
-   */
-  double get remain {
-    if (initialAmount == null || transactionAmount == null) {
-      return 0;
+  /// transaction count, this is dynamic from database.
+  int transactionCount = 0;
+  int transactionAmount = 0;
+  // Curre
+  int currencyValue = 10000;
+
+  /// remain amount, this is dynamic from database.
+  int get remain {
+    return ((initialAmount + transactionAmount) * currencyValue / 10000)
+        .round();
+  }
+
+  int get nav {
+    switch (type) {
+      case cashAccountType:
+        return remain;
+      case creditAccountType:
+        return remain - limitation;
+      case investmentAccountType:
+        return remain;
+      default:
+        return 0;
     }
-    //  5001.56 + 89.01=5090.570000000001;
-    // TODO consider using decimal or int to avoid this issue
-    return double.parse(
-        (initialAmount! + transactionAmount!).toStringAsFixed(2));
   }
 
   String get typeString {
     switch (type) {
-      case CreditAccountType:
-        return "Credit";
-      case CashAccountType:
-        return "Cash";
-      case InvestmentAccountType:
-        return "Investment";
+      case creditAccountType:
+        return '信用账户';
+      case cashAccountType:
+        return '现金账户';
+      case investmentAccountType:
+        return '投资账户';
       default:
-        return "Unknown";
+        return 'Unknown';
     }
-  }
-
-  Account(
-      {this.id,
-      this.name,
-      this.type,
-      this.archived = false,
-      this.initialAmount,
-      this.limitation});
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'type': type,
-      'name': name,
-      "initial_amount": initialAmount,
-      "limitation": limitation,
-      "transaction_count": transactionCount ?? 0
-    };
   }
 
   Map<String, dynamic> toDBMap() {
@@ -80,30 +85,9 @@ class Account {
       'type': type,
       'archived': archived ? 1 : 0,
       'name': name,
-      "initial_amount": initialAmount,
-      "limitation": limitation,
+      'currency': currency,
+      'initial_amount': initialAmount,
+      'limitation': limitation,
     };
-  }
-
-  factory Account.fromMap(Map<String, dynamic> map) {
-    return Account(
-        id: map["id"],
-        name: map["name"],
-        type: map['type'],
-        initialAmount: map["initial_amount"],
-        limitation: map["limitation"]);
-  }
-
-  factory Account.fromDBMap(Map<String, dynamic> map) {
-    var a = Account(
-        id: map["id"],
-        name: map["name"],
-        type: map['type'],
-        archived: map["archived"] == 1,
-        initialAmount: (map['initial_amount'] as num).toDouble(),
-        limitation: (map['limitation'] as num).toDouble());
-    a.transactionCount = map["transaction_count"];
-    a.transactionAmount = map["total_amount"] as double? ?? 0.0;
-    return a;
   }
 }

@@ -1,17 +1,33 @@
 class Category {
+  Category({this.id, this.name, this.description, this.icon, this.color});
+
+  factory Category.fromDBMap(Map<String, dynamic> map) {
+    final c = Category(
+        id: map['id'],
+        name: map['name'],
+        description: map['description'],
+        icon: map['icon'],
+        color: map['color']);
+    c.amount = map['amount'] as int? ?? 0;
+    c.currentMonthlyAmount =
+        (map['current_month_amount'] as num?)?.toInt() ?? 0;
+    c.lastMonthlyAmount = (map['last_month_amount'] as num?)?.toInt() ?? 0;
+    c.monthlyAverage = map['monthly_average'] as int? ?? 0;
+    c.transactionCount = map['transaction_count'] ?? 0;
+    return c;
+  }
+
   int? id;
   String? name;
   String? description;
   String? icon;
   int? color;
 
-  double? amount;
+  int? amount;
   int? transactionCount;
-  double? currentMonthlyAmount;
-  double? lastMonthlyAmount;
-  double? monthlyAverage;
-
-  Category({this.id, this.name, this.description, this.icon, this.color});
+  int? currentMonthlyAmount;
+  int? lastMonthlyAmount;
+  int? monthlyAverage;
 
   Map<String, dynamic> toMap() {
     return {
@@ -33,30 +49,5 @@ class Category {
       'icon': icon,
       'color': color,
     };
-  }
-
-  factory Category.fromDBMap(Map<String, dynamic> map) {
-    var c = Category(
-        id: map["id"],
-        name: map["name"],
-        description: map['description'],
-        icon: map["icon"],
-        color: map["color"]);
-    var amount = double.parse((map["amount"] as double).toStringAsFixed(2));
-    c.amount = amount;
-    c.currentMonthlyAmount = (map["current_month_amount"] as num).toDouble();
-    c.lastMonthlyAmount = (map["last_month_amount"] as num).toDouble();
-    c.monthlyAverage = map["monthly_average"] as double? ?? 0.0;
-    c.transactionCount = map["transaction_count"];
-    return c;
-  }
-
-  factory Category.fromJson(Map<String, dynamic> map) {
-    return Category(
-        id: map["id"],
-        name: map["name"],
-        description: map['description'],
-        icon: map["icon"],
-        color: map["color"]);
   }
 }

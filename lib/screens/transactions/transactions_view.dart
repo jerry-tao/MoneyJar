@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'transaction_table.dart';
 
-class Transactions extends StatelessWidget {
-  final QueryParams? params;
+// TODO this is useless
+class TransactionsView extends StatelessWidget {
 
-  const Transactions({Key? key, this.params}) : super(key: key);
+  const TransactionsView({Key? key, this.params}) : super(key: key);
+  final QueryParams? params;
   @override
   Widget build(BuildContext context) {
     return TransactionTable(

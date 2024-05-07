@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:moneyjar/models/category.dart';
 import 'package:moneyjar/responsive.dart';
-import 'package:flutter/material.dart';
 import 'package:moneyjar/screens/components/card_grid.dart';
 
 import '../../../constants.dart';
@@ -12,21 +12,21 @@ class CategoryInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Size _size = MediaQuery.of(context).size;
-    final List<MapEntry> data = [
-      MapEntry("Amount", category.amount),
-      MapEntry("Month", category.currentMonthlyAmount),
-      MapEntry("Last Month", category.lastMonthlyAmount),
-      MapEntry("Transaction Count", category.transactionCount),
+    final size = MediaQuery.of(context).size;
+    final data = <MapEntry>[
+      MapEntry('Amount', category.amount! / 100.0),
+      MapEntry('Month', category.currentMonthlyAmount! / 100.0),
+      MapEntry('Last Month', category.lastMonthlyAmount! / 100.0),
+      MapEntry('Transaction Count', category.transactionCount),
     ];
     return Column(
       children: [
-        SizedBox(height: defaultPadding),
+        const SizedBox(height: defaultPadding),
         Responsive(
           mobile: InfoCardGridView(
             data: data,
-            crossAxisCount: _size.width < 650 ? 2 : 4,
-            childAspectRatio: _size.width < 650 && _size.width > 350 ? 1.3 : 1,
+            crossAxisCount: size.width < 650 ? 2 : 4,
+            childAspectRatio: size.width < 650 && size.width > 350 ? 1.3 : 1,
           ),
           tablet: InfoCardGridView(
             data: data,
@@ -35,7 +35,7 @@ class CategoryInfo extends StatelessWidget {
           desktop: InfoCardGridView(
             data: data,
             // account: account,
-            childAspectRatio: _size.width < 1400 ? 1.1 : 1.4,
+            childAspectRatio: size.width < 1400 ? 1.1 : 1.4,
           ),
         ),
       ],

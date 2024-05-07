@@ -1,24 +1,24 @@
-import 'package:moneyjar/responsive.dart';
-import 'package:moneyjar/screens/categories/categories_table.dart';
-import 'package:moneyjar/screens/categories/category_form.dart';
 import 'package:flutter/material.dart';
 import 'package:moneyjar/data/database.dart';
 import 'package:moneyjar/models/category.dart';
+import 'package:moneyjar/responsive.dart';
+import 'package:moneyjar/screens/categories/categories_table.dart';
+import 'package:moneyjar/screens/categories/category_form.dart';
 
 import '../../constants.dart';
 
-class Categories extends StatefulWidget {
-  Categories();
+class CategoriesView extends StatefulWidget {
+  const CategoriesView({Key? key}) : super(key: key);
   @override
-  _CategoriesState createState() => _CategoriesState(); // change
+  State<CategoriesView> createState() => _CategoriesState(); // change
 }
 
-class _CategoriesState extends State<Categories> {
-  late Future<List<Category>> _categories;
+class _CategoriesState extends State<CategoriesView> {
   _CategoriesState();
+  late Future<List<Category>> _categories;
 
   Future<List<Category>> getRows() async {
-    var categories = await DBProvider.db.getCategories();
+    final categories = await DBProvider.db.getCategories();
     return categories;
   }
 
@@ -35,7 +35,7 @@ class _CategoriesState extends State<Categories> {
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.done) {
             if (snap.hasError) {
-              return Text("Error: ${snap.error}");
+              return Text('Error: ${snap.error}');
             }
             return Column(
               children: [
@@ -62,18 +62,21 @@ class _CategoriesState extends State<Categories> {
                                   });
                                 }));
                       },
-                      icon: Icon(Icons.add),
-                      label: Text("Add New"),
+                      icon: const Icon(Icons.add),
+                      label: const Text('Add New'),
                     ),
                   ],
                 ),
-                SizedBox(height: defaultPadding, width: double.infinity),
-                Expanded(child: CategoryTable(categories: snap.data! as List<Category>),flex: 10,)
-                ,
+                const SizedBox(height: defaultPadding, width: double.infinity),
+                Expanded(
+                  flex: 10,
+                  child:
+                      CategoryTable(categories: snap.data! as List<Category>),
+                ),
               ],
             );
           }
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         });
   }
 }
