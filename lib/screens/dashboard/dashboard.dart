@@ -7,7 +7,7 @@ import 'package:moneyjar/screens/transactions/transaction_table.dart';
 import '../../constants.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +26,8 @@ class DashboardScreen extends StatelessWidget {
 
 class DashboardWidget extends StatefulWidget {
   const DashboardWidget({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<DashboardWidget> createState() => _DashboardWidgetState();

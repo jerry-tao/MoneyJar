@@ -6,10 +6,10 @@ import '../../constants.dart';
 
 class AccountForm extends StatefulWidget {
   const AccountForm({
-    Key? key,
+    super.key,
     this.account,
     required this.callback,
-  }) : super(key: key);
+  });
   final Account? account;
   final Function(Account) callback;
 

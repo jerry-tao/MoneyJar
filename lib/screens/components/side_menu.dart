@@ -13,8 +13,8 @@ import 'package:moneyjar/screens/transactions/transactions_view.dart';
 
 class SideMenu extends StatelessWidget {
   const SideMenu({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -74,18 +74,28 @@ class SideMenu extends StatelessWidget {
               if (file != null) {
                 final myData = await file.readAsString();
                 final csvTable = const CsvToListConverter().convert(myData);
-                final success = await DBProvider.db.importCSV(csvTable);
-                // show snackbar
-                if (!context.mounted) {
-                  return;
+                try {
+                  final success = await DBProvider.db.importCSV(csvTable);
+                  // show snackbar
+                  if (!context.mounted) {
+                    return;
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                          'Imported $success from ${csvTable.length - 1} successfully'),
+                    ),
+                  );
+                } catch (e) {
+                  if (!context.mounted) {
+                    return;
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Import failed, $e'),
+                    ),
+                  );
                 }
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(success > 0
-                        ? 'Imported $success from ${csvTable.length - 1} successfully'
-                        : 'Import failed, please check the file format'),
-                  ),
-                );
               }
             },
           ),
@@ -128,12 +138,12 @@ class SideMenu extends StatelessWidget {
 
 class DrawerListTile extends StatelessWidget {
   const DrawerListTile({
-    Key? key,
+    super.key,
     // For selecting those three line once press "Command+D"
     required this.title,
     required this.icon,
     required this.press,
-  }) : super(key: key);
+  });
 
   final String title;
   final Icon icon;

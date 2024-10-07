@@ -7,9 +7,9 @@ import '../../constants.dart';
 
 class AccountView extends StatelessWidget {
   const AccountView({
-    Key? key,
+    super.key,
     required this.account,
-  }) : super(key: key);
+  });
   final Account account;
 
   @override

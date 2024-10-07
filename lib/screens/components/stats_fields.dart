@@ -9,8 +9,8 @@ import '../../../constants.dart';
 
 class StatsField extends StatelessWidget {
   const StatsField({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -44,10 +44,10 @@ class StatsField extends StatelessWidget {
 
 class StatsCardGridView extends StatelessWidget {
   const StatsCardGridView({
-    Key? key,
+    super.key,
     this.crossAxisCount = 4,
     this.childAspectRatio = 1,
-  }) : super(key: key);
+  });
 
   final int crossAxisCount;
   final double childAspectRatio;
@@ -70,9 +70,9 @@ class StatsCardGridView extends StatelessWidget {
 
 class StatsInfoCard extends StatelessWidget {
   const StatsInfoCard({
-    Key? key,
+    super.key,
     required this.info,
-  }) : super(key: key);
+  });
 
   final StatGraph info;
 
@@ -118,7 +118,6 @@ class StatsInfoCard extends StatelessWidget {
 }
 
 class StatGraph {
-
   StatGraph({this.svgSrc, this.title, this.color, required this.child});
   final String? svgSrc, title;
   final Color? color;

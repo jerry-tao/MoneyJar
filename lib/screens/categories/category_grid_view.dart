@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'package:moneyjar/controllers/refresh.dart';
 import 'package:moneyjar/data/database.dart';
 import 'package:moneyjar/models/category.dart';
@@ -9,11 +10,10 @@ import '../../constants.dart';
 
 class CategoryGridView extends StatefulWidget {
   const CategoryGridView(
-      {Key? key,
+      {super.key,
       required this.categories,
       this.crossAxisCount = 4,
-      this.childAspectRatio = 1})
-      : super(key: key);
+      this.childAspectRatio = 1});
   final List<Category> categories;
   final int crossAxisCount;
   final double childAspectRatio;
@@ -31,6 +31,12 @@ class _CategoryGridViewState extends State<CategoryGridView> {
     categories = widget.categories;
     crossAxisCount = widget.crossAxisCount;
     childAspectRatio = widget.childAspectRatio;
+  }
+
+  Icon buildIcon(Category category) {
+    return Icon(
+        deserializeIcon({'key': category.icon!, 'pack': category.iconPack!})!
+            .data);
   }
 
   @override
@@ -55,14 +61,20 @@ class _CategoryGridViewState extends State<CategoryGridView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              categories[index].name!,
-              maxLines: 1,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge!
-                  .copyWith(color: Colors.white),
-              overflow: TextOverflow.ellipsis,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                buildIcon(categories[index]),
+                Text(
+                  categories[index].name!,
+                  maxLines: 1,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(color: Colors.white),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

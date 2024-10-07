@@ -6,11 +6,11 @@ import '../../constants.dart';
 
 class Pie extends StatefulWidget {
   const Pie({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
-  PieState createState() => PieState();
+  State<Pie> createState() => _PieState();
 }
 
 class KindItem {
@@ -18,7 +18,7 @@ class KindItem {
   String name, value;
 }
 
-class PieState extends State<Pie> {
+class _PieState extends State<Pie> {
   // String? kind;
   DateTime? _start, _end;
   int touchedIndex = -1;

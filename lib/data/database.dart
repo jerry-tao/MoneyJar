@@ -38,6 +38,7 @@ class DBProvider {
       // Set the path to the database. Note: Using the `join` function from the
       // `path` package is best practice to ensure the path is correctly
       // constructed for each platform.
+      // ~/Library/Containers/com.example.moneyjar/Data/Documents/release
       join(await getDatabasesPath(), 'release/moneyjar.db'),
       onCreate: (db, version) {
         // Run the CREATE TABLE statement on the database.
@@ -67,20 +68,21 @@ class DBProvider {
             name TEXT,
             description TEXT,
             icon TEXT,
-            color INTEGER
+            icon_pack TEXT
           )
         ''');
         final exampleCategories = [
           Category(
-              name: 'Food',
-              description: 'Food and drink',
-              icon: 'food',
-              color: 0xFFE57373),
+            name: 'Food',
+            description: 'Food and drink',
+            icon: 'food',
+            iconPack: 'material',
+          ),
           Category(
               name: 'Transport',
               description: 'Transportation',
               icon: 'directions_bus',
-              color: 0xFF81C784)
+              iconPack: 'material')
         ];
         for (var element in exampleCategories) {
           db.insert('categories', element.toDBMap());
@@ -308,10 +310,18 @@ class DBProvider {
             db.insert('currencies', element.toDBMap());
           }
         }
+        if (oldVersion < 3) {
+          db.execute('''
+            ALTER TABLE categories ADD COLUMN icon_pack TEXT
+          ''');
+          db.execute('''
+            UPDATE categories SET icon_pack = 'material'
+          ''');
+        }
       },
       // Set the version. This executes the onCreate function and provides a
       // path to perform database upgrades and downgrades.
-      version: 2,
+      version: 3,
     );
     return dabase;
   }
@@ -401,8 +411,8 @@ class DBProvider {
   Future<TransactionResult> getTransactions(QueryParams params) async {
     final db = await database;
     var whereString = '';
+    var orderBy = 'date DESC';
     final whereArguments = <dynamic>[];
-
     if (params.categoryId != null && params.categoryId!.isNotEmpty) {
       whereString +=
           "category_id IN (${params.categoryId!.map((_) => '?').join(', ')}) ";
@@ -418,12 +428,40 @@ class DBProvider {
       whereArguments.addAll(params.accountId!);
     }
 
+    if (params.start != null) {
+      if (whereString.isNotEmpty) {
+        whereString += 'AND ';
+      }
+      whereString += 'date >= ? ';
+      whereArguments.add(params.start);
+    }
+
+    if (params.end != null) {
+      if (whereString.isNotEmpty) {
+        whereString += 'AND ';
+      }
+      whereString += 'date <= ? ';
+      whereArguments.add(params.end);
+    }
+
+    if (params.type != null) {
+      if (whereString.isNotEmpty) {
+        whereString += 'AND ';
+      }
+      whereString += 'transactions.type = ? ';
+      whereArguments.add(params.type);
+    }
+
     if (params.search != null && params.search!.isNotEmpty) {
       if (whereString.isNotEmpty) {
         whereString += 'AND ';
       }
       whereString += 'transactions.description LIKE ? ';
       whereArguments.add('%${params.search}%');
+    }
+
+    if (params.orderBy != null) {
+      orderBy = params.orderBy!;
     }
 
     final res = await db.rawQuery('''
@@ -436,7 +474,7 @@ class DBProvider {
     LEFT JOIN categories ON transactions.category_id = categories.id
     LEFT JOIN accounts ON transactions.account_id = accounts.id
     WHERE ${whereString.isEmpty ? '1' : whereString}
-    ORDER BY date DESC
+    ORDER BY $orderBy
     LIMIT ${params.count} OFFSET ${params.from}''',
         whereArguments.isEmpty ? null : whereArguments);
     final transactions = List.generate(res.length, (i) {
@@ -667,46 +705,51 @@ FROM
         id, name
       FROM categories
     ''');
-    final result = <Map<String, dynamic>>[];
+    final result = <model.Transaction>[]; // 修复类型声明错误
 
     // 获取 CSV 文件的标题行
     final titles = list.removeAt(0);
-
     for (var row in list) {
       final rowMap = <String, dynamic>{};
+      var t = model.Transaction(); // 定义变量 t
       for (var i = 0; i < titles.length; i++) {
         rowMap[titles[i].toString()] = row[i];
+        final account = accounts.firstWhere(
+            (a) => a['name'] == rowMap['Account'],
+            orElse: () => throw Exception(
+                'Account not found: ${rowMap['Account']}')); // 使用字符串插值
+
+        // TODO handle error
+        final category = categories.firstWhere(
+            (c) => c['name'] == rowMap['Category'],
+            orElse: () => throw Exception(
+                'Category not found: ${rowMap['Category']}')); // 使用字符串插值
+
+        rowMap['account_id'] = account['id'];
+        rowMap['category_id'] = category['id'];
+        switch (rowMap['Type']) {
+          case '收入':
+            rowMap['type'] = model.Transaction.income;
+            break;
+          case '支出':
+            rowMap['type'] = model.Transaction.expense;
+            break;
+          case '转移':
+            rowMap['type'] = model.Transaction.transfer;
+            break;
+        }
+        rowMap['date'] = rowMap['DateTime'];
+        rowMap['amount'] = ((rowMap['Amount'] as num) * 100.0).round();
+        rowMap['remark'] = rowMap['Remark'];
+        rowMap['tag'] = rowMap['Tag'];
+        rowMap['target'] = rowMap['Target'];
+        rowMap['description'] = rowMap['Description'];
+        t = model.Transaction.fromCSVMap(rowMap);
       }
-      result.add(rowMap);
+      result.add(t);
     }
     var success = 0;
-    for (var element in result) {
-      final account =
-          accounts.firstWhere((a) => a['name'] == element['Account']);
-      final category =
-          categories.firstWhere((c) => c['name'] == element['Category']);
-      element['account_id'] = account['id'];
-      element['category_id'] = category['id'];
-      // var targetAccount =
-      //     accounts.firstWhere((a) => a['name'] == element['target_account']);
-      switch (element['Type']) {
-        case '收入':
-          element['type'] = model.Transaction.income;
-          break;
-        case '支出':
-          element['type'] = model.Transaction.expense;
-          break;
-        case '转移':
-          element['type'] = model.Transaction.transfer;
-          break;
-      }
-      element['date'] = element['DateTime'];
-      element['amount'] = ((element['Amount'] as int) * 100.0).round();
-      element['remark'] = element['Remark'];
-      element['tag'] = element['Tag'];
-      element['target'] = element['Target'];
-      element['description'] = element['Description'];
-      final t = model.Transaction.fromCSVMap(element);
+    for (var t in result) {
       final value = await db.insert('transactions', t.toDBMap());
       if (value > 0) {
         success += 1;

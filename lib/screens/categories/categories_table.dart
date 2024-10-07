@@ -8,8 +8,8 @@ import 'category_grid_view.dart';
 class CategoryTable extends StatefulWidget {
   const CategoryTable({
     required this.categories,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   final List<Category> categories;
 
   @override

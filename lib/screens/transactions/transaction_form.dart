@@ -8,8 +8,7 @@ import '../../constants.dart';
 
 class TransactionForm extends StatefulWidget {
   const TransactionForm(
-      {Key? key, required this.transaction, required this.callback})
-      : super(key: key);
+      {super.key, required this.transaction, required this.callback});
   final Transaction transaction;
   final Function() callback;
   @override
@@ -35,7 +34,9 @@ class TransactionFormState extends State<TransactionForm> {
     callback = widget.callback;
     dateSelect = DateTime.now();
     dateShow = dateSelect.toString().substring(0, 19);
-
+    typeSelect = 1;
+    categorySelect = 0;
+    accountSelect = 0;
     dateSelect = DateTime.now();
     if (transaction.id != null) {
       descriptionController.text = transaction.description.toString();

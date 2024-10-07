@@ -4,7 +4,7 @@ import 'package:moneyjar/responsive.dart';
 import 'package:moneyjar/screens/components/card_grid.dart';
 
 class AccountHeader extends StatelessWidget {
-  const AccountHeader({Key? key, required this.account}) : super(key: key);
+  const AccountHeader({super.key, required this.account});
 
   final Account account;
 

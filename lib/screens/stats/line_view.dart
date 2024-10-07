@@ -6,15 +6,14 @@ import '../../constants.dart';
 
 class Line extends StatefulWidget {
   const Line({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<Line> createState() => _LineState();
 }
 
 class KindItem {
-
   KindItem({required this.name, required this.value});
   String name, value;
 }

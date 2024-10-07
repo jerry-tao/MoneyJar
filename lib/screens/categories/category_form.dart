@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_iconpicker/Models/configuration.dart';
+import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'package:moneyjar/models/category.dart';
 import '../../constants.dart';
 
 class CategoryForm extends StatefulWidget {
   const CategoryForm({
-    Key? key,
+    super.key,
     required this.category,
     required this.callback,
-  }) : super(key: key);
+  });
   final Category category;
   final Function(Category) callback;
 
@@ -18,28 +20,47 @@ class CategoryForm extends StatefulWidget {
 class _CategoryFormState extends State<CategoryForm> {
   var nameController = TextEditingController();
   var descriptionController = TextEditingController();
-  var colorController = TextEditingController();
-  var iconController = TextEditingController();
 
   late Category category;
   late Function(Category) callback;
+  late IconPickerIcon _icon;
+  late String _iconKey;
+  late String _iconPack;
+
+  Future<void> _pickIcon() async {
+    final icon = await showIconPicker(
+      context,
+      configuration: const SinglePickerConfiguration(
+        iconPackModes: [IconPack.material],
+      ),
+    );
+    if (icon == null) {
+      return;
+    }
+    _icon = icon;
+    setState(() {});
+  }
 
   @override
   void initState() {
     super.initState();
     category = widget.category;
     callback = widget.callback;
+    nameController.text = category.name ?? '';
+    descriptionController.text = category.description ?? '';
+    _iconKey = category.icon ?? 'add';
+    _iconPack = category.iconPack ?? 'material';
+    final icon = deserializeIcon({'key': _iconKey, 'pack': _iconPack});
+    if (icon != null) {
+      _icon = icon;
+    } else {
+      _icon = const IconPickerIcon(
+          name: 'add', data: Icons.add, pack: IconPack.material);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    nameController.text = category.name ?? '';
-    descriptionController.text = category.description ?? '';
-    if (category.color != null) {
-      colorController.text = category.color.toString();
-    }
-    iconController.text = category.icon ?? '';
-
     return AlertDialog(
       content: Stack(
         clipBehavior: Clip.none,
@@ -87,7 +108,11 @@ class _CategoryFormState extends State<CategoryForm> {
                             children: [
                               TextFormField(
                                 controller: nameController,
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
+                                  prefixIcon: InkWell(
+                                    onTap: _pickIcon,
+                                    child: Icon(_icon.data),
+                                  ),
                                   labelText: 'Name',
                                 ),
                               ),
@@ -134,78 +159,6 @@ class _CategoryFormState extends State<CategoryForm> {
                     ],
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.only(top: defaultPadding),
-                  padding: const EdgeInsets.all(defaultPadding),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                        width: 2, color: primaryColor.withOpacity(0.15)),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(defaultPadding),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      const SizedBox(
-                        height: 20,
-                        width: 20,
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: defaultPadding),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TextFormField(
-                                controller: colorController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Color',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(top: defaultPadding),
-                  padding: const EdgeInsets.all(defaultPadding),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                        width: 2, color: primaryColor.withOpacity(0.15)),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(defaultPadding),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      const SizedBox(
-                        height: 20,
-                        width: 20,
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: defaultPadding),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TextFormField(
-                                controller: iconController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Icon',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
                 Padding(
                     padding: const EdgeInsets.only(top: 28.0),
                     child: Row(
@@ -217,12 +170,18 @@ class _CategoryFormState extends State<CategoryForm> {
                               child: Text('Save'),
                             ),
                             onPressed: () {
+                              final iconMap = serializeIcon(_icon);
+                              if (iconMap != null) {
+                                _iconKey = iconMap['key'];
+                                _iconPack = iconMap['pack'];
+                              }
                               final c = Category(
-                                  id: category.id,
-                                  name: nameController.text,
-                                  description: descriptionController.text,
-                                  color: int.parse(colorController.text),
-                                  icon: iconController.text);
+                                id: category.id,
+                                name: nameController.text,
+                                description: descriptionController.text,
+                                icon: _iconKey,
+                                iconPack: _iconPack,
+                              );
                               c.transactionCount = category.transactionCount;
                               c.amount = category.amount;
                               callback(c);

@@ -20,6 +20,9 @@ class QueryParams {
       this.count = 10});
   List<int>? accountId, categoryId;
   String? search;
+  String? orderBy;
+  int? type;
+  int? start, end;
   int from;
   int count;
 }
@@ -30,6 +33,16 @@ class TransactionSource extends AsyncDataTableSource {
   QueryParams params;
   BuildContext? context;
   final bool showRemain;
+
+  void sort(String columnName, bool ascending) {
+    params.orderBy = columnName;
+    if (ascending) {
+      params.orderBy = columnName;
+    } else {
+      params.orderBy = '$columnName desc';
+    }
+    refreshDatasource();
+  }
 
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
@@ -128,8 +141,8 @@ class TransactionTable extends StatefulWidget {
   const TransactionTable({
     this.showRemain = false,
     required this.params,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final bool showRemain;
   final QueryParams params;
@@ -141,6 +154,9 @@ class TransactionTable extends StatefulWidget {
 class _TransactionTableState extends State<TransactionTable> {
   late QueryParams params;
   late bool showRemain;
+  bool _sortAscending = true;
+  int? _sortColumnIndex;
+  TransactionSource? _source;
 
   @override
   void initState() {
@@ -150,6 +166,17 @@ class _TransactionTableState extends State<TransactionTable> {
   }
 
   final PaginatorController _controller = PaginatorController();
+  void sort(
+    int columnIndex,
+    String columnName,
+    bool ascending,
+  ) {
+    _source!.sort(columnName, ascending);
+    setState(() {
+      _sortColumnIndex = columnIndex;
+      _sortAscending = ascending;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -178,6 +205,10 @@ class _TransactionTableState extends State<TransactionTable> {
               columnSpacing: defaultPadding,
               horizontalMargin: 20,
               rowsPerPage: 50,
+              sortColumnIndex: _sortColumnIndex,
+              sortAscending: _sortAscending,
+              sortArrowIcon: Icons.keyboard_arrow_up,
+              sortArrowAnimationDuration: const Duration(milliseconds: 0),
               empty: Center(
                   child: Container(
                       height: 100,
@@ -193,12 +224,19 @@ class _TransactionTableState extends State<TransactionTable> {
                 const DataColumn(
                   label: Text('Category'),
                 ),
-                const DataColumn(label: Text('Date')),
+                DataColumn(
+                  label: const Text('Date'),
+                  onSort: (columnIndex, ascending) =>
+                      sort(columnIndex, 'date', ascending),
+                ),
                 const DataColumn(
                   label: Text('Description'),
                 ),
-                const DataColumn(
-                  label: Text('Amount'),
+                DataColumn(
+                  label: const Text('Amount'),
+                  numeric: true,
+                  onSort: (columnIndex, ascending) =>
+                      sort(columnIndex, 'amount', ascending),
                 ),
                 const DataColumn(
                   label: Text('Type'),
@@ -216,7 +254,7 @@ class _TransactionTableState extends State<TransactionTable> {
                   label: Text('Action'),
                 ),
               ],
-              source: TransactionSource(
+              source: _source = TransactionSource(
                   params: params, context: context, showRemain: showRemain),
             ),
           ),

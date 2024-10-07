@@ -4,11 +4,11 @@ import '../../constants.dart';
 
 class InfoCardGridView extends StatelessWidget {
   const InfoCardGridView({
-    Key? key,
+    super.key,
     required this.data,
     this.crossAxisCount = 4,
     this.childAspectRatio = 1,
-  }) : super(key: key);
+  });
   final List<MapEntry> data;
 
   final int crossAxisCount;
@@ -33,9 +33,9 @@ class InfoCardGridView extends StatelessWidget {
 
 class InfoCard extends StatelessWidget {
   const InfoCard({
-    Key? key,
+    super.key,
     required this.info,
-  }) : super(key: key);
+  });
 
   final MapEntry info;
 
@@ -78,10 +78,10 @@ class InfoCard extends StatelessWidget {
 
 class ProgressLine extends StatelessWidget {
   const ProgressLine({
-    Key? key,
+    super.key,
     this.color = primaryColor,
     required this.percentage,
-  }) : super(key: key);
+  });
 
   final Color? color;
   final int? percentage;

@@ -7,9 +7,9 @@ import '../../constants.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({
-    Key? key,
+    super.key,
     required this.category,
-  }) : super(key: key);
+  });
   final Category category;
   @override
   State<CategoryView> createState() => _CategoryState();

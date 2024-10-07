@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import '../../constants.dart';
 
 class Header extends StatelessWidget {
-  const Header({Key? key, required this.title}) : super(key: key);
+  const Header({super.key, required this.title});
   final String title;
 
   @override
@@ -36,8 +36,8 @@ class Header extends StatelessWidget {
 
 class SearchField extends StatefulWidget {
   const SearchField({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<SearchField> createState() => _SearchFieldState();

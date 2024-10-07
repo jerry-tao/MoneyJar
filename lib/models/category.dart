@@ -1,13 +1,14 @@
 class Category {
-  Category({this.id, this.name, this.description, this.icon, this.color});
+  Category({this.id, this.name, this.description, this.icon, this.iconPack});
 
   factory Category.fromDBMap(Map<String, dynamic> map) {
     final c = Category(
-        id: map['id'],
-        name: map['name'],
-        description: map['description'],
-        icon: map['icon'],
-        color: map['color']);
+      id: map['id'],
+      name: map['name'],
+      description: map['description'],
+      icon: map['icon'],
+      iconPack: map['icon_pack'],
+    );
     c.amount = map['amount'] as int? ?? 0;
     c.currentMonthlyAmount =
         (map['current_month_amount'] as num?)?.toInt() ?? 0;
@@ -20,8 +21,7 @@ class Category {
   int? id;
   String? name;
   String? description;
-  String? icon;
-  int? color;
+  String? icon, iconPack;
 
   int? amount;
   int? transactionCount;
@@ -35,7 +35,7 @@ class Category {
       'name': name,
       'description': description,
       'icon': icon,
-      'color': color,
+      'icon_pack': iconPack,
       'amount': amount ?? 0.0,
       'transaction_count': transactionCount ?? 0
     };
@@ -47,7 +47,7 @@ class Category {
       'name': name,
       'description': description,
       'icon': icon,
-      'color': color,
+      'icon_pack': iconPack,
     };
   }
 }

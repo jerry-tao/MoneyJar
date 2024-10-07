@@ -3,9 +3,9 @@ import 'package:graphic/graphic.dart';
 
 class PieCard2 extends StatelessWidget {
   const PieCard2({
-    Key? key,
+    super.key,
     required this.kvs,
-  }) : super(key: key);
+  });
   final List<Map<String, dynamic>> kvs;
 
   @override
@@ -16,7 +16,7 @@ class PieCard2 extends StatelessWidget {
       top10.add({
         'name': 'Other',
         'value': double.parse(rest.fold(0, (previousValue, element) {
-          return (previousValue as num) + element['value'];
+          return (previousValue as num) + element['value'] as int;
         }).toStringAsFixed(2))
       });
       top10.sort((a, b) => (a['value'] as double).compareTo(b['value']));
@@ -103,9 +103,9 @@ class PieCard2 extends StatelessWidget {
 
 class BarCard2 extends StatelessWidget {
   const BarCard2({
-    Key? key,
+    super.key,
     required this.kvs,
-  }) : super(key: key);
+  });
   final List<Map<String, dynamic>> kvs;
 
   @override
@@ -116,7 +116,7 @@ class BarCard2 extends StatelessWidget {
       top10.add({
         'name': 'Other',
         'value': double.parse(rest.fold(0, (previousValue, element) {
-          return (previousValue as num) + element['value'];
+          return (previousValue as num) + element['value'] as int;
         }).toStringAsFixed(2))
       });
       top10.sort((a, b) => (b['value'] as double).compareTo(a['value']));

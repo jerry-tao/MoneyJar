@@ -4,9 +4,7 @@ import 'package:moneyjar/models/transaction.dart';
 import '../../constants.dart';
 
 class TransactionView extends StatelessWidget {
-
-  const TransactionView({Key? key, required this.transaction})
-      : super(key: key);
+  const TransactionView({super.key, required this.transaction});
   final Transaction transaction;
 
   @override
@@ -37,50 +35,55 @@ class TransactionView extends StatelessWidget {
           child: Column(
             children: [
               ListTile(
-                leading: const CircleAvatar(child: Icon(Icons.translate)),
+                leading: const CircleAvatar(child: Icon(Icons.receipt)),
                 title: Text('${transaction.description}'),
                 subtitle: const Text('Description'),
               ),
               const Divider(height: 0),
               ListTile(
-                leading: const CircleAvatar(child: Icon(Icons.translate)),
+                leading: const CircleAvatar(child: Icon(Icons.calendar_today)),
                 title: Text(transaction.date.toString().substring(0, 19)),
                 subtitle: const Text('Date'),
               ),
               const Divider(height: 0),
               ListTile(
-                leading: const CircleAvatar(child: Icon(Icons.translate)),
+                leading: const CircleAvatar(child: Icon(Icons.attach_money)),
                 title: Text('${transaction.amount! / 100.0}'),
-                subtitle:
-                    Text('Amount ${Transaction.typeString(transaction.type!)}'),
+                subtitle: const Text('Amount'),
               ),
               const Divider(height: 0),
               ListTile(
-                leading: const CircleAvatar(child: Icon(Icons.translate)),
+                leading: const CircleAvatar(child: Icon(Icons.import_export)),
+                title: Text(Transaction.typeString(transaction.type!)),
+                subtitle: const Text('Type'),
+              ),
+              const Divider(height: 0),
+              ListTile(
+                leading: const CircleAvatar(child: Icon(Icons.category)),
                 title: Text('${transaction.category}'),
                 subtitle: const Text('Category'),
               ),
               const Divider(height: 0),
               ListTile(
-                leading: const CircleAvatar(child: Icon(Icons.translate)),
+                leading: const CircleAvatar(child: Icon(Icons.account_balance)),
                 title: Text('${transaction.account}'),
                 subtitle: const Text('Account'),
               ),
               const Divider(height: 0),
               ListTile(
-                leading: const CircleAvatar(child: Icon(Icons.translate)),
+                leading: const CircleAvatar(child: Icon(Icons.comment)),
                 title: Text(transaction.remark),
                 subtitle: const Text('Remark'),
               ),
               const Divider(height: 0),
               ListTile(
-                leading: const CircleAvatar(child: Icon(Icons.translate)),
+                leading: const CircleAvatar(child: Icon(Icons.account_box)),
                 title: Text(transaction.target),
                 subtitle: const Text('Target'),
               ),
               const Divider(height: 0),
               ListTile(
-                leading: const CircleAvatar(child: Icon(Icons.translate)),
+                leading: const CircleAvatar(child: Icon(Icons.tag)),
                 title: Text(transaction.tag),
                 subtitle: const Text('Tag'),
               ),

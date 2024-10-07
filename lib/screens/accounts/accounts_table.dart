@@ -11,8 +11,8 @@ import '../../../constants.dart';
 class AccountTable extends StatefulWidget {
   const AccountTable({
     required this.accounts,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   final List<Account> accounts;
 
   @override

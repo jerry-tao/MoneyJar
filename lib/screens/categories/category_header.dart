@@ -6,7 +6,7 @@ import 'package:moneyjar/screens/components/card_grid.dart';
 import '../../../constants.dart';
 
 class CategoryInfo extends StatelessWidget {
-  const CategoryInfo({Key? key, required this.category}) : super(key: key);
+  const CategoryInfo({super.key, required this.category});
 
   final Category category;
 

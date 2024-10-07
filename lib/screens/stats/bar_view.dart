@@ -7,8 +7,8 @@ import '../../constants.dart';
 
 class Bar extends StatefulWidget {
   const Bar({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<Bar> createState() => _BarState();

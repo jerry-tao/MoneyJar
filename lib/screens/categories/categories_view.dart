@@ -8,7 +8,7 @@ import 'package:moneyjar/screens/categories/category_form.dart';
 import '../../constants.dart';
 
 class CategoriesView extends StatefulWidget {
-  const CategoriesView({Key? key}) : super(key: key);
+  const CategoriesView({super.key});
   @override
   State<CategoriesView> createState() => _CategoriesState(); // change
 }
@@ -70,8 +70,7 @@ class _CategoriesState extends State<CategoriesView> {
                 const SizedBox(height: defaultPadding, width: double.infinity),
                 Expanded(
                   flex: 10,
-                  child:
-                      CategoryTable(categories: snap.data! as List<Category>),
+                  child: CategoryTable(categories: snap.data!),
                 ),
               ],
             );

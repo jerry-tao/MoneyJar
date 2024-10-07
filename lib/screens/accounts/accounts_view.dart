@@ -8,7 +8,7 @@ import 'package:moneyjar/screens/accounts/accounts_table.dart';
 import '../../constants.dart';
 
 class AccountsView extends StatefulWidget {
-  const AccountsView({Key? key}) : super(key: key);
+  const AccountsView({super.key});
 
   @override
   State<AccountsView> createState() => _AccountsState();
@@ -59,7 +59,7 @@ class _AccountsState extends State<AccountsView> {
                 Expanded(
                   child: snap.data == null || (snap.data! as List).isEmpty
                       ? const Center(child: Text('No Account found'))
-                      : AccountTable(accounts: snap.data! as List<Account>),
+                      : AccountTable(accounts: snap.data!),
                 ),
               ],
             );

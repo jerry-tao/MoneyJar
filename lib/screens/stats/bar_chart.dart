@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:graphic/graphic.dart';
 
 class BarChart extends StatelessWidget {
-  BarChart({Key? key, required this.kvs}) : super(key: key);
+  BarChart({super.key, required this.kvs});
   final Map<String, List<Map>> kvs;
   final priceVolumeStream = StreamController<GestureEvent>.broadcast();
   @override
